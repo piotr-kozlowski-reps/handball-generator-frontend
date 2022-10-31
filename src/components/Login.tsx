@@ -1,23 +1,26 @@
 import React, { Fragment } from "react";
-import { LoginFormValues } from "../../utils/types/app.types";
+import { LoginFormValues } from "../utils/types/app.types";
 import * as Yup from "yup";
 import { Formik, Form, FormikHelpers, FormikProps } from "formik";
 
-import herb from "../../images/gornik-logo-01.png";
-import FormikControl from "../formik-components/FormikControl";
-import Button from "../ui/Button";
-import { useLoginPostData } from "../../hooks/useLoginPostData";
+import herb from "../images/gornik-logo-01.png";
+import FormikControl from "./formik-components/FormikControl";
+import Button from "./ui/Button";
+import { usePostData } from "../hooks/useCRUDOperationsHelper";
+import useAuth from "../hooks/useAuth";
+import { AxiosError, AxiosResponse } from "axios";
 
 const Login = () => {
   ////vars
-  const { mutate, isLoading } = useLoginPostData();
+  const { mutate, isLoading } = usePostData("/api/aut");
+  const { setAuth } = useAuth();
   ////formik
   const formikInitialValues: LoginFormValues = {
-    login: "",
+    userName: "",
     password: "",
   };
   const validationSchema = Yup.object({
-    login: Yup.string().required("Login jest wymagany."),
+    userName: Yup.string().required("Użytkownik jest wymagany."),
     password: Yup.mixed().test({
       name: "required",
       message: "Hasło jest wymagane.",
@@ -33,12 +36,21 @@ const Login = () => {
     formikHelpers: FormikHelpers<LoginFormValues>
   ) => {
     const loginBody: LoginFormValues = {
-      login: values.login,
+      userName: values.userName,
       password: values.password,
     };
     mutate(loginBody, {
       onSuccess: (data) => {
-        console.log(data);
+        const accessToken: string = data.data.accessToken;
+        const roles: number[] = data.data.roles;
+        setAuth({ accessToken, roles });
+        formikHelpers.setSubmitting(false);
+        formikHelpers.resetForm();
+      },
+      onError: (error) => {
+        const axiosReadableError: AxiosError = error as AxiosError;
+
+        console.log(axiosReadableError?.response?.data);
       },
     });
   };
@@ -70,10 +82,11 @@ const Login = () => {
                   <FormikControl
                     control="input"
                     type="text"
-                    label="Login:"
-                    name="login"
-                    placeholder={"tu wpisz login"}
+                    label="Użytkownik:"
+                    name="userName"
+                    placeholder={"tu wpisz nazwę uzytkownika"}
                     additionalClass=""
+                    formik={formik}
                   />
                 </div>
                 <div className="w-full p-2">
@@ -84,6 +97,7 @@ const Login = () => {
                     name="password"
                     placeholder={"tu wpisz hasło"}
                     additionalClass=""
+                    formik={formik}
                   />
                 </div>
                 <div className="pt-6">

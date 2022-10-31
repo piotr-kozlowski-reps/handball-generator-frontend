@@ -1,16 +1,25 @@
 import React, { ComponentType, Fragment, useState } from "react";
-import { Field, ErrorMessage } from "formik";
+import { Field, ErrorMessage, FormikProps } from "formik";
 import TextErrorFormik from "./TextErrorFormik";
 
-const InputFormik = (props: any) => {
+interface Props {
+  label: string;
+  name: string;
+  placeholder: string;
+  additionalClass: string;
+  formik: FormikProps<any>;
+}
+
+const InputFormik = (props: Props) => {
   ////vars
   const {
     label,
     name,
-    errors,
+    // errors,
     placeholder,
-    touched,
+    // touched,
     additionalClass,
+    formik,
     ...rest
   } = props;
   const [isFocused, setIsFocused] = useState(false);

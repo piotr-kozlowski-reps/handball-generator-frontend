@@ -1,23 +1,47 @@
 import React, { Fragment } from "react";
-import { useAuthentication } from "./hooks/useAuthentication";
-import Login from "./components/login/Login";
-import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Routes, Route } from "react-router-dom";
 
-const queryClient = new QueryClient();
+import Login from "./components/Login";
+import Layout from "./components/Layout";
+import Unauthorized from "./components/Unauthorized";
+import Missing from "./components/Missing";
 
 function App() {
   ////vars
-  const { isLoggedIn } = useAuthentication();
 
   ////jsx
+  // return <Fragment>{!isLoggedIn && <Login />}</Fragment>;
   return (
-    <QueryClientProvider client={queryClient}>
-      <Fragment>
-        {!isLoggedIn && <Login />}
-        <ReactQueryDevtools initialIsOpen={false} position="bottom-left" />
-      </Fragment>
-    </QueryClientProvider>
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        {/* free accessed routes */}
+        <Route path="login" element={<Login />} />
+        <Route path="unauthorized" element={<Unauthorized />} />
+        {/* we want to protect these routes */}
+        {/* <Route element={<PersistLogin />}>
+          <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
+            <Route path="/" element={<Home />} />
+          </Route>
+
+          <Route element={<RequireAuth allowedRoles={[ROLES.Editor]} />}>
+            <Route path="editor" element={<Editor />} />
+          </Route>
+
+          <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
+            <Route path="admin" element={<Admin />} />
+          </Route>
+
+          <Route
+            element={<RequireAuth allowedRoles={[ROLES.Editor, ROLES.Admin]} />}
+          >
+            <Route path="lounge" element={<Lounge />} />
+          </Route>
+        </Route> */}
+
+        {/* catch all */}
+        <Route path="*" element={<Missing />} />
+      </Route>
+    </Routes>
   );
 }
 

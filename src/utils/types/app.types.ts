@@ -1,5 +1,5 @@
 //formik
 export interface LoginFormValues {
-  login: string;
+  userName: string;
   password: string;
 }

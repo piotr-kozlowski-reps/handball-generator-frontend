@@ -5,9 +5,15 @@ import InputFormik from "./InputFormik";
 
 interface Props {
   control: "input";
+  type: React.HTMLInputTypeAttribute | undefined;
+  label: string;
+  name: string;
+  placeholder: string;
+  additionalClass: string;
+  formik: FormikProps<any>;
 }
 
-const FormikControl = (props: any) => {
+const FormikControl = (props: Props) => {
   ////vars
   const { control, ...rest } = props;
 
