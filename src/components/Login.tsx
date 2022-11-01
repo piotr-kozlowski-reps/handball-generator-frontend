@@ -1,19 +1,28 @@
-import React, { Fragment } from "react";
+import React, { CSSProperties, Fragment, useRef } from "react";
 import { LoginFormValues } from "../utils/types/app.types";
 import * as Yup from "yup";
 import { Formik, Form, FormikHelpers, FormikProps } from "formik";
+import { useLocation, useNavigate } from "react-router-dom";
+import { AxiosError, AxiosResponse } from "axios";
 
 import herb from "../images/gornik-logo-01.png";
+
 import FormikControl from "./formik-components/FormikControl";
 import Button from "./ui/Button";
 import { usePostData } from "../hooks/useCRUDOperationsHelper";
 import useAuth from "../hooks/useAuth";
-import { AxiosError, AxiosResponse } from "axios";
+import Loading from "./ui/Loading";
 
 const Login = () => {
   ////vars
-  const { mutate, isLoading } = usePostData("/api/aut");
+  const { mutate, isLoading } = usePostData("/api/auth");
   const { setAuth } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+
+  console.log(location);
+
   ////formik
   const formikInitialValues: LoginFormValues = {
     userName: "",
@@ -46,11 +55,22 @@ const Login = () => {
         setAuth({ accessToken, roles });
         formikHelpers.setSubmitting(false);
         formikHelpers.resetForm();
+        navigate(from, { replace: true });
       },
       onError: (error) => {
         const axiosReadableError: AxiosError = error as AxiosError;
 
         console.log(axiosReadableError?.response?.data);
+        if (!axiosReadableError?.response) {
+          alert("No Server Response");
+        } else if (axiosReadableError.response?.status === 400) {
+          alert("Missing Username or Password");
+        } else if (axiosReadableError.response?.status === 401) {
+          alert("Unauthorized");
+        } else {
+          alert("Login Failed");
+        }
+        // errRef.current.focus();
       },
     });
   };
@@ -58,6 +78,7 @@ const Login = () => {
   ////jsx
   return (
     <Fragment>
+      {isLoading && <Loading />}
       <Formik
         initialValues={formikInitialValues}
         validationSchema={validationSchema}
@@ -68,7 +89,7 @@ const Login = () => {
           ////jsx
           return (
             <Form>
-              <div className="w-full h-screen flex flex-col justify-center items-center">
+              <div className="w-96 h-screen flex flex-col justify-center items-center">
                 <div>
                   <div className="pb-20">
                     <img src={herb} alt="Herb" />
@@ -86,6 +107,7 @@ const Login = () => {
                     name="userName"
                     placeholder={"tu wpisz nazwę uzytkownika"}
                     additionalClass=""
+                    isFocusOn={true}
                     formik={formik}
                   />
                 </div>

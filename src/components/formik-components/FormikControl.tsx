@@ -10,6 +10,7 @@ interface Props {
   name: string;
   placeholder: string;
   additionalClass: string;
+  isFocusOn?: boolean;
   formik: FormikProps<any>;
 }
 

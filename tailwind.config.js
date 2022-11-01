@@ -10,6 +10,7 @@ module.exports = {
       appMainBackground: "#FAFBFB",
       appMainDarkBackground: "#20232A",
       appButton: "#3f3408",
+      black: "#000",
     },
     fontFamily: {
       display: ["Dosis", "sans-serif"],

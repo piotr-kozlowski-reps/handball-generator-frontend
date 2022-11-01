@@ -5,6 +5,14 @@ import Login from "./components/Login";
 import Layout from "./components/Layout";
 import Unauthorized from "./components/Unauthorized";
 import Missing from "./components/Missing";
+import PersistLogin from "./components/PersistLogin";
+import RequireAuth from "./components/RequireAuth";
+import Home from "./components/Home";
+
+const ROLES = {
+  User: 2001,
+  Admin: 5150,
+}; //TODO: sprawdzić numery ROLES
 
 function App() {
   ////vars
@@ -17,7 +25,14 @@ function App() {
         {/* free accessed routes */}
         <Route path="login" element={<Login />} />
         <Route path="unauthorized" element={<Unauthorized />} />
-        {/* we want to protect these routes */}
+
+        {/* protected these routes */}
+        <Route element={<PersistLogin />}>
+          <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
+            <Route path="/" element={<Home />} />
+          </Route>
+        </Route>
+
         {/* <Route element={<PersistLogin />}>
           <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
             <Route path="/" element={<Home />} />
