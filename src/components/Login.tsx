@@ -1,5 +1,8 @@
 import React, { CSSProperties, Fragment, useRef } from "react";
-import { LoginFormValues } from "../utils/types/app.types";
+import {
+  LoginFormValues,
+  NotificationInterface,
+} from "../utils/types/app.types";
 import * as Yup from "yup";
 import { Formik, Form, FormikHelpers, FormikProps } from "formik";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -11,17 +14,18 @@ import FormikControl from "./formik-components/FormikControl";
 import Button from "./ui/Button";
 import { usePostData } from "../hooks/useCRUDOperationsHelper";
 import useAuth from "../hooks/useAuth";
+import useNotification from "../hooks/useNotification";
 import Loading from "./ui/Loading";
+import Notification from "./ui/Notification";
 
 const Login = () => {
   ////vars
   const { mutate, isLoading } = usePostData("/api/auth");
   const { setAuth } = useAuth();
+  const { notification, showNotification } = useNotification();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
-
-  console.log(location);
 
   ////formik
   const formikInitialValues: LoginFormValues = {
@@ -50,9 +54,12 @@ const Login = () => {
     };
     mutate(loginBody, {
       onSuccess: (data) => {
+        console.log(data);
+
         const accessToken: string = data.data.accessToken;
         const roles: number[] = data.data.roles;
         setAuth({ accessToken, roles });
+
         formikHelpers.setSubmitting(false);
         formikHelpers.resetForm();
         navigate(from, { replace: true });
@@ -60,16 +67,33 @@ const Login = () => {
       onError: (error) => {
         const axiosReadableError: AxiosError = error as AxiosError;
 
-        console.log(axiosReadableError?.response?.data);
-        if (!axiosReadableError?.response) {
-          alert("No Server Response");
-        } else if (axiosReadableError.response?.status === 400) {
-          alert("Missing Username or Password");
-        } else if (axiosReadableError.response?.status === 401) {
-          alert("Unauthorized");
+        if (
+          axiosReadableError.response?.status === 401 ||
+          axiosReadableError.response?.status === 400
+        ) {
+          showNotification({
+            status: "error",
+            title: "Niezalgowany.",
+            message: "Niepoprawne dane.",
+          });
         } else {
-          alert("Login Failed");
+          showNotification({
+            status: "error",
+            title: "Niezalgowany.",
+            message: "Bład logowania.",
+          });
         }
+
+        // console.log(axiosReadableError?.response?.data);
+        // if (!axiosReadableError?.response) {
+        //   alert("No Server Response");
+        // } else if (axiosReadableError.response?.status === 400) {
+        //   alert("Missing Username or Password");
+        // } else if (axiosReadableError.response?.status === 401) {
+        //   alert("Unauthorized");
+        // } else {
+        //   alert("Login Failed");
+        // }
         // errRef.current.focus();
       },
     });
@@ -79,6 +103,13 @@ const Login = () => {
   return (
     <Fragment>
       {isLoading && <Loading />}
+      {notification && (
+        <Notification
+          status={notification.status}
+          title={notification.title}
+          message={notification.message}
+        />
+      )}
       <Formik
         initialValues={formikInitialValues}
         validationSchema={validationSchema}
@@ -114,7 +145,7 @@ const Login = () => {
                 <div className="w-full p-2">
                   <FormikControl
                     control="input"
-                    type="text"
+                    type="password"
                     label="Password:"
                     name="password"
                     placeholder={"tu wpisz hasło"}

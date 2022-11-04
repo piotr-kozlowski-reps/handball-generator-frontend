@@ -8,11 +8,15 @@ import Missing from "./components/Missing";
 import PersistLogin from "./components/PersistLogin";
 import RequireAuth from "./components/RequireAuth";
 import Home from "./components/Home";
+import Team from "./components/Team";
+import BackgroundImage from "./components/BackgroundImage";
+import MatchKind from "./components/MatchKind";
+import Sponsors from "./components/Sponsors";
 
 const ROLES = {
-  User: 2001,
-  Admin: 5150,
-}; //TODO: sprawdzić numery ROLES
+  Admin: 2001,
+  User: 2002,
+};
 
 function App() {
   ////vars
@@ -28,8 +32,14 @@ function App() {
 
         {/* protected these routes */}
         <Route element={<PersistLogin />}>
-          <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
+          <Route
+            element={<RequireAuth allowedRoles={[ROLES.Admin, ROLES.User]} />}
+          >
             <Route path="/" element={<Home />} />
+            <Route path="/team" element={<Team />} />
+            <Route path="/background-image" element={<BackgroundImage />} />
+            <Route path="/match-kind" element={<MatchKind />} />
+            <Route path="/sponsors" element={<Sponsors />} />
           </Route>
         </Route>
 

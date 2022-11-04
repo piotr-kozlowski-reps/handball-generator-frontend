@@ -6,6 +6,7 @@ module.exports = {
   theme: {
     colors: {
       appInFocus: "#456576",
+      appSuccess: "#765372",
       appError: "#c94141",
       appMainBackground: "#FAFBFB",
       appMainDarkBackground: "#20232A",
