@@ -1,12 +1,20 @@
-import { Field, Form, Formik, FormikProps } from "formik";
+import { Field, Form, Formik, FormikHelpers, FormikProps } from "formik";
 import React, { Fragment } from "react";
 import * as Yup from "yup";
 import { TeamFormValues } from "../utils/types/app.types";
 import FormikControl from "./formik-components/FormikControl";
 import Button from "./ui/Button";
+import { usePostData, useGetData } from "../hooks/useCRUDHelperWithCredentials";
+import Loading from "./ui/Loading";
+import { AxiosError } from "axios";
+import useNotification from "../hooks/useNotification";
+import Notification from "./ui/Notification";
 
 const Team = () => {
   ////vars
+  const { notification, showNotification } = useNotification();
+  const { mutate, isLoading: isLoadingPost } = usePostData("/api/team");
+  const { data, isLoading: isLoadingGet } = useGetData("/api/team", ["teams"]);
 
   ////formik
   const formikInitialValues: TeamFormValues = {
@@ -29,13 +37,65 @@ const Team = () => {
         test: (value) => value && value.type === "image/png",
       }),
   });
-  function onSubmitHandler() {}
+  const onSubmitHandler = async (
+    values: TeamFormValues,
+    formikHelpers: FormikHelpers<TeamFormValues>
+  ) => {
+    console.log(values);
+
+    const formData: any = new FormData();
+    formData.append("teamName", values.teamName);
+    formData.append("place", values.place);
+    formData.append("teamCrest", values.teamCrest);
+
+    mutate(formData, {
+      onSuccess: (data) => {
+        console.log(data.data);
+        showNotification({
+          status: "success",
+          title: "Dodano drużynę.",
+          message: `Dodana drużyna:\nnazwa: ${data.data.result.teamName}\nmiejsce: ${data.data.result.place}\nherb: ${data.data.result.teamCrest}`,
+        });
+        formikHelpers.setSubmitting(false);
+        formikHelpers.resetForm();
+      },
+      onError: (error) => {
+        const axiosReadableError: AxiosError = error as AxiosError;
+        if (
+          axiosReadableError.response?.status === 401 ||
+          axiosReadableError.response?.status === 400
+        ) {
+          showNotification({
+            status: "error",
+            title: "Niezalgowany.",
+            message: "Niepoprawne dane.",
+          });
+        } else {
+          showNotification({
+            status: "error",
+            title: "Brak dostępu.",
+            message: "Brak dostępu do zasobów.",
+          });
+        }
+      },
+    });
+  };
 
   ////jsx
   return (
     <Fragment>
-      {/* {isLoading && <Loading />} */}
-      <p> Wprowadź drużynę:</p>
+      {(isLoadingPost || isLoadingGet) && <Loading />}
+      {notification && (
+        <Notification
+          status={notification.status}
+          title={notification.title}
+          message={notification.message}
+        />
+      )}
+      <div className="pb-12">
+        <p>Lista druzyn:</p>
+      </div>
+      <hr />
       <Formik
         initialValues={formikInitialValues}
         validationSchema={validationSchema}
@@ -50,7 +110,9 @@ const Team = () => {
             <Form>
               <div className="w-96 h-screen flex flex-col justify-center items-center">
                 <div className="pt-12">
-                  <span className="font-bold uppercase text-xl">coś</span>
+                  <span className="font-bold uppercase text-xl">
+                    Wprowadź drużynę
+                  </span>
                 </div>
                 <div className="w-full p-2">
                   <FormikControl
@@ -123,7 +185,5 @@ const Team = () => {
     </Fragment>
   );
 };
-
-// herb (png) - walidacja rozdzielczości grafiki, ustawiana w pliku konf., walidacja typu pliku
 
 export default Team;
