@@ -1,31 +1,55 @@
-import { Field, Form, Formik, FormikHelpers, FormikProps } from "formik";
-import React, { Fragment } from "react";
+import { Form, Formik, FormikHelpers, FormikProps } from "formik";
+import React, { Fragment, useEffect, useState } from "react";
 import * as Yup from "yup";
-import { TeamFormValues } from "../utils/types/app.types";
+import { TeamFormValues, TeamInterface } from "../utils/types/app.types";
 import FormikControl from "./formik-components/FormikControl";
 import Button from "./ui/Button";
-import { usePostData, useGetData } from "../hooks/useCRUDHelperWithCredentials";
+import {
+  usePostData,
+  useGetData,
+  useDeleteData,
+} from "../hooks/useCRUDHelperWithCredentials";
 import Loading from "./ui/Loading";
 import { AxiosError } from "axios";
 import useNotification from "../hooks/useNotification";
 import Notification from "./ui/Notification";
+import { NOTIFICATIONS } from "../utils/notifications/predefinedNotifications";
+
+const QUERY_KEY = ["teams"];
+const ADDRESS = "/api/team";
 
 const Team = () => {
   ////vars
+  const [teams, setTeams] = useState<TeamInterface[]>([]);
   const { notification, showNotification } = useNotification();
-  const { mutate, isLoading: isLoadingPost } = usePostData("/api/team");
-  const { data, isLoading: isLoadingGet } = useGetData("/api/team", ["teams"]);
+  const { mutate: postForm, isLoading: isLoadingPost } = usePostData(
+    ADDRESS,
+    QUERY_KEY
+  );
+  const { mutate: deleteTeam, isLoading: isDeletingPost } = useDeleteData(
+    ADDRESS,
+    QUERY_KEY
+  );
+  const { data, isLoading: isLoadingGet } = useGetData(ADDRESS, QUERY_KEY);
+
+  useEffect(() => {
+    if (data) {
+      console.log({ data });
+
+      setTeams([...data.data]);
+    }
+  }, [data]);
 
   ////formik
   const formikInitialValues: TeamFormValues = {
     teamName: "",
     place: "",
-    teamCrest: null,
+    teamCrestImage: null,
   };
   const validationSchema = Yup.object({
     teamName: Yup.string().required("Nazwa drużyny jest wymagana."),
     place: Yup.string().required("Lokalizacja drużyny jest wymagana."),
-    teamCrest: Yup.mixed()
+    teamCrestImage: Yup.mixed()
       .test({
         name: "required",
         message: "Herb drużyny jest wymagany.",
@@ -41,20 +65,18 @@ const Team = () => {
     values: TeamFormValues,
     formikHelpers: FormikHelpers<TeamFormValues>
   ) => {
-    console.log(values);
-
     const formData: any = new FormData();
     formData.append("teamName", values.teamName);
     formData.append("place", values.place);
-    formData.append("teamCrest", values.teamCrest);
+    formData.append("teamCrestImage", values.teamCrestImage);
 
-    mutate(formData, {
+    postForm(formData, {
       onSuccess: (data) => {
         console.log(data.data);
         showNotification({
           status: "success",
           title: "Dodano drużynę.",
-          message: `Dodana drużyna:\nnazwa: ${data.data.result.teamName}\nmiejsce: ${data.data.result.place}\nherb: ${data.data.result.teamCrest}`,
+          message: `Dodana drużyna:\nnazwa: ${data.data.result.teamName}\nmiejsce: ${data.data.result.place}\nherb: ${data.data.result.teamCrestImage}`,
         });
         formikHelpers.setSubmitting(false);
         formikHelpers.resetForm();
@@ -65,17 +87,9 @@ const Team = () => {
           axiosReadableError.response?.status === 401 ||
           axiosReadableError.response?.status === 400
         ) {
-          showNotification({
-            status: "error",
-            title: "Niezalgowany.",
-            message: "Niepoprawne dane.",
-          });
+          showNotification(NOTIFICATIONS.NOT_LOGGED);
         } else {
-          showNotification({
-            status: "error",
-            title: "Brak dostępu.",
-            message: "Brak dostępu do zasobów.",
-          });
+          showNotification(NOTIFICATIONS.NO_ACCESS);
         }
       },
     });
@@ -84,7 +98,7 @@ const Team = () => {
   ////jsx
   return (
     <Fragment>
-      {(isLoadingPost || isLoadingGet) && <Loading />}
+      {(isLoadingPost || isLoadingGet || isDeletingPost) && <Loading />}
       {notification && (
         <Notification
           status={notification.status}
@@ -94,6 +108,40 @@ const Team = () => {
       )}
       <div className="pb-12">
         <p>Lista druzyn:</p>
+        <ul>
+          {teams.length > 0 ? (
+            teams.map((team) => (
+              <li
+                key={team.teamName}
+                className="p-4 m-1 bg-appInFocus bg-opacity-10"
+              >
+                <p>
+                  nazwa druzyny:{" "}
+                  <span className="font-bold">{team.teamName}</span>
+                </p>
+                <p>
+                  miejsce: <span className="font-bold">{team.place}</span>
+                </p>
+                <img
+                  src={`${process.env.REACT_APP_BACKEND_URL}/${team.teamCrestImage}`}
+                  alt={team.teamName}
+                  width="50"
+                  height="50"
+                />
+                <button
+                  className="bg-appInFocus p-1 text-white"
+                  onClick={() => {
+                    deleteTeam(team._id);
+                  }}
+                >
+                  delete
+                </button>
+              </li>
+            ))
+          ) : (
+            <p>Nie ma żadnych drużyn</p>
+          )}
+        </ul>
       </div>
       <hr />
       <Formik
@@ -153,12 +201,12 @@ const Team = () => {
 
                 <div className="w-full p-2">
                   <input
-                    id="teamCrest"
-                    name="teamCrest"
+                    id="teamCrestImage"
+                    name="teamCrestImage"
                     type="file"
                     onChange={(event) => {
                       formik.setFieldValue(
-                        "teamCrest",
+                        "teamCrestImage",
                         event?.currentTarget?.files?.[0]
                       );
                     }}
