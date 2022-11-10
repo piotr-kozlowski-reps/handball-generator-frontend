@@ -1,18 +1,20 @@
 import { FormikProps } from "formik";
 import React from "react";
-import { LoginFormValues } from "../../utils/types/app.types";
+import { DropDownOptions, LoginFormValues } from "../../utils/types/app.types";
 import ImageUploadFormik from "./ImageUploadFormik";
 import InputFormik from "./InputFormik";
+import SelectFormik from "./SelectFormik";
 
 interface Props {
-  control: "input" | "image";
+  control: "input" | "image" | "select";
   type?: React.HTMLInputTypeAttribute | undefined;
   label: string;
   name: string;
-  placeholder: string;
+  placeholder?: string;
   additionalClass: string;
   isFocusOn?: boolean;
   additionalText?: string;
+  options?: DropDownOptions[];
   formik: FormikProps<any>;
 }
 
@@ -22,10 +24,13 @@ const FormikControl = (props: Props) => {
 
   switch (control) {
     case "input":
-      return <InputFormik {...rest} />;
+      return <InputFormik placeholder={props.placeholder!} {...rest} />;
 
     case "image":
-      return <ImageUploadFormik {...rest} />;
+      return <ImageUploadFormik placeholder={props.placeholder!} {...rest} />;
+
+    case "select":
+      return <SelectFormik options={props.options!} {...rest} />;
 
     default:
       return null;

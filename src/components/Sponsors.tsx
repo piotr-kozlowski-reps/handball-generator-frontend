@@ -17,23 +17,32 @@ import Button from "./ui/Button";
 import Loading from "./ui/Loading";
 import { AxiosError } from "axios";
 import { NOTIFICATIONS } from "../utils/notifications/predefinedNotifications";
+import { useLocation, useNavigate } from "react-router-dom";
 
-const QUERY_KEY = ["sponsors-bar"];
-const ADDRESS = "/api/sponsors-bar";
+import { QUERIES_DATA } from "../utils/queriesData/predefinedQueriesData";
+const QUERY_KEY = QUERIES_DATA.SPONSORS_BARS.queryKey;
+const ADDRESS = QUERIES_DATA.SPONSORS_BARS.address;
 
 const Sponsors = () => {
   ////vars
   const [sponsorsBars, setSponsorsBars] = useState<SponsorBarInterface[]>([]);
   const { notification, showNotification } = useNotification();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { mutate: postSponsorBar, isLoading: isLoadingPost } = usePostData(
     ADDRESS,
     QUERY_KEY
   );
   const { mutate: deleteSponsorBar, isLoading: isDeletingPost } = useDeleteData(
     ADDRESS,
-    QUERY_KEY
+    QUERY_KEY,
+    location
   );
-  const { data, isLoading: isLoadingGet } = useGetData(ADDRESS, QUERY_KEY);
+  const { data, isLoading: isLoadingGet } = useGetData(
+    ADDRESS,
+    QUERY_KEY,
+    location
+  );
 
   ////effects
   useEffect(() => {
@@ -70,7 +79,7 @@ const Sponsors = () => {
     values: SponsorBarFormValues,
     formikHelpers: FormikHelpers<SponsorBarFormValues>
   ) => {
-    console.log(values);
+    // console.log(values);
 
     const formData: any = new FormData();
     formData.append("barName", values.barName);
@@ -96,6 +105,7 @@ const Sponsors = () => {
         } else {
           showNotification(NOTIFICATIONS.NO_ACCESS);
         }
+        navigate("/login", { state: { from: location }, replace: true });
       },
     });
   };

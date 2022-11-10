@@ -10,8 +10,10 @@ import RequireAuth from "./components/RequireAuth";
 import Home from "./components/Home";
 import Team from "./components/Team";
 import BackgroundImage from "./components/BackgroundImage";
-import MatchKind from "./components/MatchKind";
 import Sponsors from "./components/Sponsors";
+import GameName from "./components/GameName";
+import MatchDay from "./components/MatchDay";
+import MatchConfig from "./components/MatchConfig";
 
 const ROLES = {
   Admin: 2001,
@@ -38,8 +40,10 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/team" element={<Team />} />
             <Route path="/background-image" element={<BackgroundImage />} />
-            <Route path="/match-kind" element={<MatchKind />} />
+            <Route path="/game-name" element={<GameName />} />
             <Route path="/sponsors" element={<Sponsors />} />
+            <Route path="/match-day" element={<MatchDay />} />
+            <Route path="/match-config" element={<MatchConfig />} />
           </Route>
         </Route>
 

@@ -18,9 +18,11 @@ import {
   BackgroundImageInterface,
 } from "../utils/types/app.types";
 import useRefreshToken from "../hooks/useRefreshToken";
+import { useLocation, useNavigate } from "react-router-dom";
+import { QUERIES_DATA } from "../utils/queriesData/predefinedQueriesData";
 
-const QUERY_KEY = ["background-images"];
-const ADDRESS = "/api/background-image";
+const QUERY_KEY = QUERIES_DATA.BACKGROUND_IMAGES.queryKey;
+const ADDRESS = QUERIES_DATA.BACKGROUND_IMAGES.address;
 
 const BackgroundImage = () => {
   ////vars
@@ -28,14 +30,20 @@ const BackgroundImage = () => {
     BackgroundImageInterface[]
   >([]);
   const { notification, showNotification } = useNotification();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const { mutate: postBackgroundImage, isLoading: isLoadingPost } = usePostData(
     ADDRESS,
     QUERY_KEY
   );
   const { mutate: deleteBackgroundImage, isLoading: isDeletingPost } =
-    useDeleteData(ADDRESS, QUERY_KEY);
-  const { data, isLoading: isLoadingGet } = useGetData(ADDRESS, QUERY_KEY);
-  const refresh = useRefreshToken();
+    useDeleteData(ADDRESS, QUERY_KEY, location);
+  const { data, isLoading: isLoadingGet } = useGetData(
+    ADDRESS,
+    QUERY_KEY,
+    location
+  );
 
   ////effects
   useEffect(() => {
@@ -84,7 +92,7 @@ const BackgroundImage = () => {
         showNotification({
           status: "success",
           title: "Dodano obrazek tła.",
-          message: `Dodany obrazek tła:\nnazwa: ${data.data.result.backgroundImageName}\obrazek: ${data.data.result.backgroundImage}`,
+          message: `Dodany obrazek tła:\nnazwa: ${data.data.result.backgroundImageName}\nobrazek: ${data.data.result.backgroundImage}`,
         });
         formikHelpers.setSubmitting(false);
         formikHelpers.resetForm();
@@ -99,6 +107,7 @@ const BackgroundImage = () => {
         } else {
           showNotification(NOTIFICATIONS.NO_ACCESS);
         }
+        navigate("/login", { state: { from: location }, replace: true });
       },
     });
   };
@@ -115,7 +124,6 @@ const BackgroundImage = () => {
         />
       )}
       <div className="pb-12">
-        <button onClick={() => refresh()}>refresh</button>
         <p>Lista obrazków tła:</p>
         <ul>
           {backgroundImages?.length ? (
@@ -159,8 +167,6 @@ const BackgroundImage = () => {
         validateOnMount={true}
       >
         {(formik: FormikProps<BackgroundImageFormValues>) => {
-          console.log(formik);
-
           ////jsx
           return (
             <Form>

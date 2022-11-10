@@ -40,9 +40,50 @@ export interface BackgroundImageFormValues {
   backgroundImage: File | null;
 }
 
+//game-name
+export interface GameNameInterface {
+  gameName: string;
+  gameImage: string;
+  _id: string;
+}
+export interface GameNameFormValues {
+  gameName: string;
+  gameImage: File | null;
+}
+
+//match-config
+export interface MatchConfigFormValues {
+  date: string;
+  time: string;
+  gameName: string;
+  sponsorsBar: string | null;
+  isHost: boolean;
+  opponent: string;
+  differentPlace: string | null;
+}
+
+//match-day
+export interface MatchDayFormValues {
+  background: string;
+}
+export interface MatchDayInterface {
+  background: string;
+  _id: string;
+}
+
 ////
 export interface NotificationInterface {
   title: string;
   message: string;
   status: "success" | "error";
+}
+
+export interface QueryData {
+  queryKey: string[];
+  address: string;
+}
+
+export interface DropDownOptions {
+  key: string;
+  value: string;
 }

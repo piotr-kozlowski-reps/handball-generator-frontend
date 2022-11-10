@@ -1,37 +1,41 @@
+import React, { useState, useEffect, Fragment } from "react";
 import { Form, Formik, FormikHelpers, FormikProps } from "formik";
-import React, { Fragment, useEffect, useState } from "react";
-import * as Yup from "yup";
-import { TeamFormValues, TeamInterface } from "../utils/types/app.types";
-import FormikControl from "./formik-components/FormikControl";
-import Button from "./ui/Button";
+import useNotification from "../hooks/useNotification";
 import {
   usePostData,
   useGetData,
   useDeleteData,
 } from "../hooks/useCRUDHelperWithCredentials";
+import * as Yup from "yup";
+import Notification from "./ui/Notification";
+import FormikControl from "./formik-components/FormikControl";
+import Button from "./ui/Button";
 import Loading from "./ui/Loading";
 import { AxiosError } from "axios";
-import useNotification from "../hooks/useNotification";
-import Notification from "./ui/Notification";
 import { NOTIFICATIONS } from "../utils/notifications/predefinedNotifications";
 import { useLocation, useNavigate } from "react-router-dom";
+import {
+  GameNameFormValues,
+  GameNameInterface,
+} from "../utils/types/app.types";
 
 import { QUERIES_DATA } from "../utils/queriesData/predefinedQueriesData";
-const QUERY_KEY = QUERIES_DATA.TEAMS.queryKey;
-const ADDRESS = QUERIES_DATA.TEAMS.address;
+const QUERY_KEY = QUERIES_DATA.GAME_NAMES.queryKey;
+const ADDRESS = QUERIES_DATA.GAME_NAMES.address;
 
-const Team = () => {
+const GameName = () => {
   ////vars
-  const [teams, setTeams] = useState<TeamInterface[]>([]);
+  const [gameNames, setGameNames] = useState<GameNameInterface[]>([]);
   const { notification, showNotification } = useNotification();
-  const location = useLocation();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const { mutate: postForm, isLoading: isLoadingPost } = usePostData(
+  ////CRUD
+  const { mutate: postGameName, isLoading: isLoadingPost } = usePostData(
     ADDRESS,
     QUERY_KEY
   );
-  const { mutate: deleteTeam, isLoading: isDeletingPost } = useDeleteData(
+  const { mutate: deleteGameName, isLoading: isDeletingPost } = useDeleteData(
     ADDRESS,
     QUERY_KEY,
     location
@@ -42,51 +46,53 @@ const Team = () => {
     location
   );
 
+  ////effects
   useEffect(() => {
     if (data) {
-      console.log({ data });
-
-      setTeams([...data.data]);
+      console.log(data);
+      setGameNames([...data.data]);
     }
   }, [data]);
 
   ////formik
-  const formikInitialValues: TeamFormValues = {
-    teamName: "",
-    place: "",
-    teamCrestImage: null,
+  const formikInitialValues: GameNameFormValues = {
+    gameName: "",
+    gameImage: null,
   };
   const validationSchema = Yup.object({
-    teamName: Yup.string().required("Nazwa drużyny jest wymagana."),
-    place: Yup.string().required("Lokalizacja drużyny jest wymagana."),
-    teamCrestImage: Yup.mixed()
+    gameName: Yup.string().required("Nazwa rozgrywek jest wymagana."),
+    gameImage: Yup.mixed()
       .test({
         name: "required",
-        message: "Herb drużyny jest wymagany.",
+        message: "Grafika rozgrywek jest wymagana.",
         test: (value) => value !== null,
       })
       .test({
         name: "type",
-        message: "Herb drużyny musi być plikiem PNG.",
-        test: (value) => value && value.type === "image/png",
+        message: "Grafika rozgrywek musi być plikiem PNG/JPG/JPEG.",
+        test: (value) =>
+          value &&
+          (value.type === "image/png" ||
+            value.type === "image/jpg" ||
+            value.type === "image/jpeg"),
       }),
   });
   const onSubmitHandler = async (
-    values: TeamFormValues,
-    formikHelpers: FormikHelpers<TeamFormValues>
+    values: GameNameFormValues,
+    formikHelpers: FormikHelpers<GameNameFormValues>
   ) => {
-    const formData: any = new FormData();
-    formData.append("teamName", values.teamName);
-    formData.append("place", values.place);
-    formData.append("teamCrestImage", values.teamCrestImage);
+    console.log(values);
 
-    postForm(formData, {
+    const formData: any = new FormData();
+    formData.append("gameName", values.gameName);
+    formData.append("gameImage", values.gameImage);
+    postGameName(formData, {
       onSuccess: (data) => {
         console.log(data.data);
         showNotification({
           status: "success",
-          title: "Dodano drużynę.",
-          message: `Dodana drużyna:\nnazwa: ${data.data.result.teamName}\nmiejsce: ${data.data.result.place}\nherb: ${data.data.result.teamCrestImage}`,
+          title: "Dodano nazwę rozgrywek.",
+          message: `Dodany nazwa rozgrywek:\nnazwa: ${data.data.result.gameName}\nobrazek: ${data.data.result.gameImage}`,
         });
         formikHelpers.setSubmitting(false);
         formikHelpers.resetForm();
@@ -118,31 +124,28 @@ const Team = () => {
         />
       )}
       <div className="pb-12">
-        <p>Lista druzyn:</p>
+        <p>Lista rodzajów rozgrywek:</p>
         <ul>
-          {teams.length > 0 ? (
-            teams.map((team) => (
+          {gameNames?.length ? (
+            gameNames.map((gameName) => (
               <li
-                key={team.teamName}
+                key={gameName.gameName}
                 className="p-4 m-1 bg-appInFocus bg-opacity-10"
               >
                 <p>
-                  nazwa druzyny:{" "}
-                  <span className="font-bold">{team.teamName}</span>
-                </p>
-                <p>
-                  miejsce: <span className="font-bold">{team.place}</span>
+                  nazwa rozgrywek:
+                  <span className="font-bold">{gameName.gameName}</span>
                 </p>
                 <img
-                  src={`${process.env.REACT_APP_BACKEND_URL}/${team.teamCrestImage}`}
-                  alt={team.teamName}
-                  width="50"
-                  height="50"
+                  src={`${process.env.REACT_APP_BACKEND_URL}/${gameName.gameImage}`} //TODO: finalnie .backgroundImageThumbnail
+                  alt={gameName.gameName}
+                  width="200"
+                  height="200"
                 />
                 <button
                   className="bg-appInFocus p-1 text-white"
                   onClick={() => {
-                    deleteTeam(team._id);
+                    deleteGameName(gameName._id);
                   }}
                 >
                   delete
@@ -150,7 +153,7 @@ const Team = () => {
               </li>
             ))
           ) : (
-            <p>Nie ma żadnych drużyn</p>
+            <p>Nie ma żadnych rodzajów rozgrywek.</p>
           )}
         </ul>
       </div>
@@ -161,63 +164,37 @@ const Team = () => {
         onSubmit={onSubmitHandler}
         validateOnMount={true}
       >
-        {(formik: FormikProps<TeamFormValues>) => {
-          // console.log(formik);
-
+        {(formik: FormikProps<GameNameFormValues>) => {
           ////jsx
           return (
             <Form>
               <div className="w-96 h-screen flex flex-col justify-center items-center">
                 <div className="pt-12">
                   <span className="font-bold uppercase text-xl">
-                    Wprowadź drużynę
+                    Wprowadź rodzaj rozgrywek
                   </span>
                 </div>
                 <div className="w-full p-2">
                   <FormikControl
                     control="input"
                     type="text"
-                    label="Nazwa drużyny:"
-                    name="teamName"
-                    placeholder={"tu wpisz nazwę drużyny"}
+                    label="Nazwa rodzaju rozgrywek:"
+                    name="gameName"
+                    placeholder={"tu wpisz nazwę rodzaju rozgrywek"}
                     additionalClass=""
                     isFocusOn={true}
                     formik={formik}
                   />
                 </div>
-                <div className="w-full p-2">
-                  <FormikControl
-                    control="input"
-                    type="text"
-                    label="Lokalizacja drużyny:"
-                    name="place"
-                    placeholder={"tu wpisz lokalizację drużyny"}
-                    additionalClass=""
-                    formik={formik}
-                  />
-                </div>
-
-                {/* <div className="w-full p-2">
-                  <FormikControl
-                    control="image"
-                    label="Application image"
-                    name="appInfo.appImageFull"
-                    additionalText="(Provide only one file. Formats supported: .jpg .jpeg .png
-                      .gif. Remember -> Here PhoneImage with 345x701px resolution.)"
-                    placeholder=""
-                    additionalClass=""
-                    formik={formik}
-                  />
-                </div> */}
 
                 <div className="w-full p-2">
                   <input
-                    id="teamCrestImage"
-                    name="teamCrestImage"
+                    id="gameImage"
+                    name="gameImage"
                     type="file"
                     onChange={(event) => {
                       formik.setFieldValue(
-                        "teamCrestImage",
+                        "gameImage",
                         event?.currentTarget?.files?.[0]
                       );
                     }}
@@ -245,4 +222,4 @@ const Team = () => {
   );
 };
 
-export default Team;
+export default GameName;

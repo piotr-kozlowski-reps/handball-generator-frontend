@@ -4,7 +4,7 @@ import useRefreshToken from "./useRefreshToken";
 import useAuth from "./useAuth";
 import { AxiosRequestConfig } from "axios";
 
-const useAxiosPrivate = () => {
+const useAxiosPrivateFormData = () => {
   const refresh = useRefreshToken();
   const { auth } = useAuth();
 
@@ -44,4 +44,4 @@ const useAxiosPrivate = () => {
   return axiosPrivateFormData;
 };
 
-export default useAxiosPrivate;
+export default useAxiosPrivateFormData;
