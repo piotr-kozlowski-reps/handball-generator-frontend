@@ -18,6 +18,8 @@ import {
   TeamInterface,
 } from "../utils/types/app.types";
 import { useGetData } from "../hooks/useCRUDHelperWithCredentials";
+import useAxiosPrivateJSON from "../hooks/useAxiosPrivateJSON";
+import useLocalStorage from "../hooks/useLocalStorage";
 
 const QUERY_KEY_GAMENAMES = QUERIES_DATA.GAME_NAMES.queryKey;
 const ADDRESS_GAMENAMES = QUERIES_DATA.GAME_NAMES.address;
@@ -34,8 +36,11 @@ const MatchConfig = () => {
   const [sponsorsBars, setSponsorsBars] = useState<SponsorBarInterface[]>([]);
   const [teams, setTeams] = useState<TeamInterface[]>([]);
 
+  const axiosPrivate = useAxiosPrivateJSON();
+
   const { notification, showNotification } = useNotification();
   const location = useLocation();
+  const [matchConfig, setMatchConfig] = useLocalStorage("matchConfig");
 
   ////data fetching
   //game names
@@ -68,6 +73,7 @@ const MatchConfig = () => {
       setTeams([...fetchedTeams.data]);
     }
   }, [fetchedTeams]);
+  //one game name
 
   ////data for selects
   //game names
@@ -102,7 +108,7 @@ const MatchConfig = () => {
     date: "",
     time: "",
     gameName: "",
-    sponsorsBar: null,
+    sponsorsBar: "",
     isHost: true,
     opponent: "",
     differentPlace: "",
@@ -112,21 +118,6 @@ const MatchConfig = () => {
     time: Yup.string().required("Podaj godzinę meczu."),
     gameName: Yup.string().required("Podaj rodzaj rozgrywek."),
     opponent: Yup.string().required("Podaj nazwę przeciwnika."),
-    // backgroundImage: Yup.mixed()
-    //   .test({
-    //     name: "required",
-    //     message: "Obrazek tła jest wymagany.",
-    //     test: (value) => value !== null,
-    //   })
-    //   .test({
-    //     name: "type",
-    //     message: "Obrazek tła musi być plikiem PNG/JPG/JPEG.",
-    //     test: (value) =>
-    //       value &&
-    //       (value.type === "image/png" ||
-    //         value.type === "image/jpg" ||
-    //         value.type === "image/jpeg"),
-    //   }),
   });
   const cancelFormHandler = (formik: FormikProps<MatchConfigFormValues>) => {
     formik.resetForm();
@@ -137,33 +128,44 @@ const MatchConfig = () => {
   ) => {
     console.log(values);
 
-    // const formData: any = new FormData();
-    // formData.append("backgroundImageName", values.backgroundImageName);
-    // formData.append("backgroundImage", values.backgroundImage);
-    // postBackgroundImage(formData, {
-    //   onSuccess: (data) => {
-    //     console.log(data.data);
-    //     showNotification({
-    //       status: "success",
-    //       title: "Dodano obrazek tła.",
-    //       message: `Dodany obrazek tła:\nnazwa: ${data.data.result.backgroundImageName}\nobrazek: ${data.data.result.backgroundImage}`,
-    //     });
-    //     formikHelpers.setSubmitting(false);
-    //     formikHelpers.resetForm();
-    //   },
-    //   onError: (error) => {
-    //     const axiosReadableError: AxiosError = error as AxiosError;
-    //     if (
-    //       axiosReadableError.response?.status === 401 ||
-    //       axiosReadableError.response?.status === 400
-    //     ) {
-    //       showNotification(NOTIFICATIONS.NOT_LOGGED);
-    //     } else {
-    //       showNotification(NOTIFICATIONS.NO_ACCESS);
-    //     }
-    //     navigate("/login", { state: { from: location }, replace: true });
-    //   },
-    // });
+    let fetchedGameName;
+    let fetchedOpponent;
+    let sponsorsBarOpponent;
+    try {
+      fetchedGameName = await axiosPrivate.get(
+        `/api/game-name/${values.gameName}`
+      );
+      fetchedOpponent = await axiosPrivate.get(`/api/team/${values.opponent}`);
+      if (values.sponsorsBar) {
+        sponsorsBarOpponent = await axiosPrivate.get(
+          `/api/sponsors-bar/${values.sponsorsBar}`
+        );
+      }
+    } catch (error) {
+      console.error();
+    }
+
+    if (!fetchedGameName || !fetchedOpponent) {
+      showNotification({
+        title: "Brak danych",
+        message: "Nie udało się pobrać danych z serwera, spróbuj ponownie.",
+        status: "error",
+      });
+      return;
+    }
+    const finalObjectToBeSavedInLocalStorage = {
+      date: values.date,
+      time: values.time,
+      differentPlace: values.differentPlace,
+      isHost: values.isHost,
+      gameName: fetchedGameName.data.gameName,
+      opponent: fetchedOpponent.data.team,
+      sponsorsBar: sponsorsBarOpponent?.data?.sponsorsBar
+        ? sponsorsBarOpponent.data.sponsorsBar
+        : "",
+    };
+
+    setMatchConfig(finalObjectToBeSavedInLocalStorage);
   };
 
   ////jsx
@@ -276,7 +278,9 @@ const MatchConfig = () => {
                     type="text"
                     label="Inne miejsce:"
                     name="differentPlace"
-                    placeholder={"tu (ewentualną) inną lokalizację meczu"}
+                    placeholder={
+                      "(opcjonalnie) tu wpisz inną lokalizację meczu"
+                    }
                     additionalClass=""
                     formik={formik}
                   />

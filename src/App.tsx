@@ -20,7 +20,7 @@ const ROLES = {
   User: 2002,
 };
 
-function App() {
+const App: React.FC = () => {
   ////vars
 
   ////jsx
@@ -72,6 +72,6 @@ function App() {
       </Route>
     </Routes>
   );
-}
+};
 
 export default App;
