@@ -5,76 +5,39 @@ import { useDropzone } from "react-dropzone";
 interface Props {
   label: string;
   name: string;
-  placeholder: string;
   additionalClass: string;
   isFocusOn?: boolean;
   formik: FormikProps<any>;
 }
 
 const ImageUploadFormik = (props: Props) => {
-  ////vars
-  //   const {
-  //     label,
-  //     name,
-  //     // errors,
-  //     // touched,
-  //     additionalClass,
-  //   } = props;
+  //vars
+  const { label, name, additionalClass } = props;
 
-  //   const [file, setFile] = useState<File | null>(null);
-  //   const [previewUrl, setPreviewUrl] = useState();
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState();
 
-  //   //useDropZone - start
-  // const onDrop = useCallback(
-  //   (acceptedFiles: File[]) => {
-  //     const file = acceptedFiles[0]
-  //     console.log(file);
+  //useDropZone - start
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (acceptedFiles.length < 0) {
+      const file = acceptedFiles[0];
+      console.log(file);
+    }
+  }, []);
 
-  //   },
-  //   [],
-  // )
-
-  // function onDrop(acceptedFile: File[], rejectedFile: File[]) {
-  //   if (acceptedFile.length === 1) {
-  //     setFile(acceptedFile[0]);
-  //     return;
-  //   }
-
-  //   if (rejectedFile.length === 1) {
-  //     return;
-  //   }
-
-  // }
-
-  // const [selectedFileUrl, setSelectedFileUrl] = useState('');
-
-  // const onDrop = useCallback(acceptedFiles => {
-  // 	const file = acceptedFiles[0];
-  // 	const fileUrl = URL.createObjectURL(file);
-
-  // 	setSelectedFileUrl(fileUrl);
-  // 	onFileUploaded(file);
-  // }, [onFileUploaded]);
-
-  // const {
-  //   getRootProps,
-  //   getInputProps,
-  //   isDragActive,
-  //   isFocused,
-  //   acceptedFiles,
-  //   fileRejections,
-  // } = useDropzone({
-  //   maxFiles: 1,
-  //   accept: {
-  //     `image/*`: [".png"],
-  //   },
-  //   onDrop,
-  //     });
-
-  // accept: ["image/png", "image/jpg", "image/jpeg", "image/gif"],
-  // maxFiles: 1,
-  // onDrop,
-
+  ////useDropZone - start
+  const {
+    getRootProps,
+    getInputProps,
+    isDragActive,
+    isFocused,
+    acceptedFiles,
+    fileRejections,
+  } = useDropzone({
+    accept: { "image/*": [".png", ".jpg", ".jpeg", ".gif"] },
+    maxFiles: 1,
+    onDrop,
+  });
   //useDropZone - end
 
   ////jsx

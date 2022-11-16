@@ -210,7 +210,7 @@ const Team = () => {
                   />
                 </div>
 
-                {/* <div className="w-full p-2">
+                <div className="w-full p-2">
                   <FormikControl
                     control="image"
                     label="Application image"
@@ -221,9 +221,9 @@ const Team = () => {
                     additionalClass=""
                     formik={formik}
                   />
-                </div> */}
+                </div>
 
-                <div className="w-full p-2">
+                {/* <div className="w-full p-2">
                   <input
                     id="teamCrestImage"
                     name="teamCrestImage"
@@ -235,7 +235,7 @@ const Team = () => {
                       );
                     }}
                   />
-                </div>
+                </div> */}
 
                 <div className="pt-6">
                   <Button
