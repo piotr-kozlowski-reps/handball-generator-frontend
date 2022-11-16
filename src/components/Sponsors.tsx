@@ -31,12 +31,25 @@ const Sponsors = () => {
   const navigate = useNavigate();
   const { mutate: postSponsorBar, isLoading: isLoadingPost } = usePostData(
     ADDRESS,
-    QUERY_KEY
+    QUERY_KEY,
+    (error) => {
+      showNotification({
+        status: "error",
+        title: "Błąd",
+        message: `Nie udało się utworzyć paska sponsorów. Error: ${error}`,
+      });
+    }
   );
   const { mutate: deleteSponsorBar, isLoading: isDeletingPost } = useDeleteData(
     ADDRESS,
     QUERY_KEY,
-    location
+    (error) => {
+      showNotification({
+        status: "error",
+        title: "Błąd",
+        message: `Nie udało się skasować paska sponsorów. Error: ${error}`,
+      });
+    }
   );
   const { data, isLoading: isLoadingGet } = useGetData(
     ADDRESS,
@@ -86,7 +99,7 @@ const Sponsors = () => {
     formData.append("sponsorsBarImage", values.sponsorsBarImage);
     postSponsorBar(formData, {
       onSuccess: (data) => {
-        console.log(data.data);
+        // console.log(data.data);
         showNotification({
           status: "success",
           title: "Dodano pasek sponsorów.",
@@ -97,15 +110,15 @@ const Sponsors = () => {
       },
       onError: (error) => {
         const axiosReadableError: AxiosError = error as AxiosError;
-        if (
-          axiosReadableError.response?.status === 401 ||
-          axiosReadableError.response?.status === 400
-        ) {
+        if (axiosReadableError.response?.status === 401) {
           showNotification(NOTIFICATIONS.NOT_LOGGED);
         } else {
-          showNotification(NOTIFICATIONS.NO_ACCESS);
+          showNotification({
+            status: "error",
+            title: "Błąd",
+            message: `Nie udało się utworzyć paska sponsorów. \n Error: ${axiosReadableError.response?.data}`,
+          });
         }
-        navigate("/login", { state: { from: location }, replace: true });
       },
     });
   };

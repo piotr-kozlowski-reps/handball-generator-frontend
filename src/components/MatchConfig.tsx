@@ -10,10 +10,10 @@ import { NOTIFICATIONS } from "../utils/notifications/predefinedNotifications";
 import { useLocation, useNavigate } from "react-router-dom";
 import { QUERIES_DATA } from "../utils/queriesData/predefinedQueriesData";
 import {
-  BackgroundImageInterface,
   DropDownOptions,
   GameNameInterface,
   MatchConfigFormValues,
+  MatchConfigInterface,
   SponsorBarInterface,
   TeamInterface,
 } from "../utils/types/app.types";
@@ -153,16 +153,16 @@ const MatchConfig = () => {
       });
       return;
     }
-    const finalObjectToBeSavedInLocalStorage = {
+    const finalObjectToBeSavedInLocalStorage: MatchConfigInterface = {
       date: values.date,
       time: values.time,
-      differentPlace: values.differentPlace,
-      isHost: values.isHost,
       gameName: fetchedGameName.data.gameName,
-      opponent: fetchedOpponent.data.team,
       sponsorsBar: sponsorsBarOpponent?.data?.sponsorsBar
         ? sponsorsBarOpponent.data.sponsorsBar
         : "",
+      isHost: values.isHost,
+      opponent: fetchedOpponent.data.team,
+      differentPlace: values.differentPlace,
     };
 
     setMatchConfig(finalObjectToBeSavedInLocalStorage);

@@ -6,9 +6,14 @@ import { Location, useNavigate } from "react-router-dom";
 ////TODO: generics: axiosPrivateFormData.post<TYP>
 
 ////POST
-export const usePostData = (address: string, queryKey: string[]) => {
+export const usePostData = (
+  address: string,
+  queryKey: string[],
+  onErrorHandler:
+    | ((error: unknown, variables: string, context: unknown) => unknown)
+    | undefined
+) => {
   ////vars
-  const { auth } = useAuth();
   const queryClient = useQueryClient();
   const axiosPrivateFormData = useAxiosPrivateFormData();
 
@@ -19,6 +24,7 @@ export const usePostData = (address: string, queryKey: string[]) => {
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
     },
+    onError: onErrorHandler,
   });
 };
 
@@ -48,7 +54,9 @@ export const useGetData = (
 export const useDeleteData = (
   address: string,
   queryKey: string[],
-  location: Location
+  onErrorHandler:
+    | ((error: unknown, variables: string, context: unknown) => unknown)
+    | undefined
 ) => {
   ////vars
   const { auth } = useAuth();
@@ -63,8 +71,9 @@ export const useDeleteData = (
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
     },
-    onError: () => {
-      navigate("/login", { state: { from: location }, replace: true });
-    },
+    // onError: () => {
+    //   navigate("/login", { state: { from: location }, replace: true });
+    // },
+    onError: onErrorHandler,
   });
 };

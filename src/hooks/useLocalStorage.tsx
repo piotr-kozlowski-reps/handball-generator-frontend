@@ -58,7 +58,7 @@ const useLocalStorage = <T,>(key: string, initValue?: T): ReturnType<T> => {
         console.error(err);
       }
     }
-  }, [state]);
+  }, [state, key]);
 
   return [state, setState];
 };

@@ -35,10 +35,23 @@ const BackgroundImage = () => {
 
   const { mutate: postBackgroundImage, isLoading: isLoadingPost } = usePostData(
     ADDRESS,
-    QUERY_KEY
+    QUERY_KEY,
+    (error) => {
+      showNotification({
+        status: "error",
+        title: "Błąd",
+        message: `Nie udało się utworzyć paska sponsorów. Error: ${error}`,
+      });
+    }
   );
   const { mutate: deleteBackgroundImage, isLoading: isDeletingPost } =
-    useDeleteData(ADDRESS, QUERY_KEY, location);
+    useDeleteData(ADDRESS, QUERY_KEY, (error) => {
+      showNotification({
+        status: "error",
+        title: "Błąd",
+        message: `Nie udało się tła. Error: ${error}`,
+      });
+    });
   const { data, isLoading: isLoadingGet } = useGetData(
     ADDRESS,
     QUERY_KEY,
@@ -48,8 +61,6 @@ const BackgroundImage = () => {
   ////effects
   useEffect(() => {
     if (data) {
-      console.log(data);
-
       setBackgroundImages([...data.data]);
     }
   }, [data]);
@@ -81,8 +92,6 @@ const BackgroundImage = () => {
     values: BackgroundImageFormValues,
     formikHelpers: FormikHelpers<BackgroundImageFormValues>
   ) => {
-    console.log(values);
-
     const formData: any = new FormData();
     formData.append("backgroundImageName", values.backgroundImageName);
     formData.append("backgroundImage", values.backgroundImage);
@@ -99,15 +108,15 @@ const BackgroundImage = () => {
       },
       onError: (error) => {
         const axiosReadableError: AxiosError = error as AxiosError;
-        if (
-          axiosReadableError.response?.status === 401 ||
-          axiosReadableError.response?.status === 400
-        ) {
+        if (axiosReadableError.response?.status === 401) {
           showNotification(NOTIFICATIONS.NOT_LOGGED);
         } else {
-          showNotification(NOTIFICATIONS.NO_ACCESS);
+          showNotification({
+            status: "error",
+            title: "Błąd",
+            message: `Nie udało się utworzyć tła. \n Error: ${axiosReadableError.response?.data}`,
+          });
         }
-        navigate("/login", { state: { from: location }, replace: true });
       },
     });
   };
@@ -139,7 +148,7 @@ const BackgroundImage = () => {
                   </span>
                 </p>
                 <img
-                  src={`${process.env.REACT_APP_BACKEND_URL}/${background.backgroundImage}`} //TODO: finalnie .backgroundImageThumbnail
+                  src={`${process.env.REACT_APP_BACKEND_URL}/${background.backgroundImageThumbnail}`}
                   alt={background.backgroundImageName}
                   width="200"
                   height="200"
@@ -225,119 +234,3 @@ const BackgroundImage = () => {
 };
 
 export default BackgroundImage;
-
-// const Sponsors = () => {
-
-//   ////jsx
-//   return (
-//     <Fragment>
-//       {(isLoadingPost || isLoadingGet || isDeletingPost) && <Loading />}
-//       {notification && (
-//         <Notification
-//           status={notification.status}
-//           title={notification.title}
-//           message={notification.message}
-//         />
-//       )}
-//       <div className="pb-12">
-//         <p>Lista pasków sponsorów:</p>
-//         <ul>
-//           {sponsorsBars.length > 0 ? (
-//             sponsorsBars.map((sponsorBar) => (
-//               <li
-//                 key={sponsorBar.barName}
-//                 className="p-4 m-1 bg-appInFocus bg-opacity-10"
-//               >
-//                 <p>
-//                   nazwa paska sponsorów:{" "}
-//                   <span className="font-bold">{sponsorBar.barName}</span>
-//                 </p>
-//                 <img
-//                   src={`${process.env.REACT_APP_BACKEND_URL}/${sponsorBar.sponsorsBarImage}`}
-//                   alt={sponsorBar.barName}
-//                   width="250"
-//                   height="80"
-//                 />
-//                 <button
-//                   className="bg-appInFocus p-1 text-white"
-//                   onClick={() => {
-//                     deleteSponsorBar(sponsorBar._id);
-//                   }}
-//                 >
-//                   delete
-//                 </button>
-//               </li>
-//             ))
-//           ) : (
-//             <p>Nie ma żadnych pasków sponsorów</p>
-//           )}
-//         </ul>
-//       </div>
-//       <hr />
-//       <Formik
-//         initialValues={formikInitialValues}
-//         validationSchema={validationSchema}
-//         onSubmit={onSubmitHandler}
-//         validateOnMount={true}
-//       >
-//         {(formik: FormikProps<SponsorBarFormValues>) => {
-//           console.log(formik);
-
-//           ////jsx
-//           return (
-//             <Form>
-//               <div className="w-96 h-screen flex flex-col justify-center items-center">
-//                 <div className="pt-12">
-//                   <span className="font-bold uppercase text-xl">
-//                     Wprowadź pasek sponsorów
-//                   </span>
-//                 </div>
-//                 <div className="w-full p-2">
-//                   <FormikControl
-//                     control="input"
-//                     type="text"
-//                     label="Nazwa paska sponsorów:"
-//                     name="barName"
-//                     placeholder={"tu wpisz nazwę paska sponsorów"}
-//                     additionalClass=""
-//                     isFocusOn={true}
-//                     formik={formik}
-//                   />
-//                 </div>
-
-//                 <div className="w-full p-2">
-//                   <input
-//                     id="sponsorsBarImage"
-//                     name="sponsorsBarImage"
-//                     type="file"
-//                     onChange={(event) => {
-//                       formik.setFieldValue(
-//                         "sponsorsBarImage",
-//                         event?.currentTarget?.files?.[0]
-//                       );
-//                     }}
-//                   />
-//                 </div>
-
-//                 <div className="pt-6">
-//                   <Button
-//                     disabled={!formik.isValid || formik.isSubmitting}
-//                     type="submit"
-//                     color="white"
-//                     bgColor={`bg-appButton`}
-//                     text="Wyślij"
-//                     borderRadius="10px"
-//                     size="md"
-//                     additionalClass="px-7"
-//                   />
-//                 </div>
-//               </div>
-//             </Form>
-//           );
-//         }}
-//       </Formik>
-//     </Fragment>
-//   );
-// };
-
-// export default Sponsors;

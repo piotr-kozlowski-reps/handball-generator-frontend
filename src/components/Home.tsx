@@ -6,7 +6,6 @@ const Home = () => {
   ////vars
   const logout = useLogout();
   const navigate = useNavigate();
-  const { auth } = useAuth();
 
   const singOutHandler = async () => {
     await logout();

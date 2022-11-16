@@ -30,20 +30,27 @@ interface AuthInterface {
 interface AuthProviderInterface {
   auth: AuthInterface | undefined;
   setAuth: React.Dispatch<React.SetStateAction<AuthInterface | undefined>>;
+  persist: boolean;
+  setPersist: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 ////context
 const defaultState: AuthProviderInterface = {
   auth: {},
   setAuth: () => {},
+  persist: false,
+  setPersist: () => {},
 };
 const AuthContext = createContext<AuthProviderInterface>(defaultState);
 
 export const AuthProvider = ({ children }: Props) => {
   const [auth, setAuth] = useState<AuthInterface>();
+  const [persist, setPersist] = useState<boolean>(
+    JSON.parse(localStorage.getItem("persist") || "false") || false
+  );
 
   return (
-    <AuthContext.Provider value={{ auth, setAuth }}>
+    <AuthContext.Provider value={{ auth, setAuth, persist, setPersist }}>
       {children}
     </AuthContext.Provider>
   );

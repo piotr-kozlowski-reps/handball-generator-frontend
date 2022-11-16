@@ -1,4 +1,4 @@
-import React, {  Fragment, useRef } from "react";
+import React, { Fragment, useEffect, useRef } from "react";
 import {
   LoginFormValues,
   NotificationInterface,
@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import { Formik, Form, FormikHelpers, FormikProps } from "formik";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AxiosError, AxiosResponse } from "axios";
+import useLocalStorage from "../hooks/useLocalStorage";
 
 import herb from "../images/gornik-logo-01.png";
 
@@ -21,7 +22,7 @@ import Notification from "./ui/Notification";
 const Login = () => {
   ////vars
   const { mutate, isLoading } = usePostData("/api/auth");
-  const { setAuth } = useAuth();
+  const { setAuth, persist, setPersist } = useAuth();
   const { notification, showNotification } = useNotification();
   const navigate = useNavigate();
   const location = useLocation();
@@ -99,6 +100,14 @@ const Login = () => {
     });
   };
 
+  //// Persistent login - trusted device
+  const togglePersistHandler = () => {
+    setPersist((prev) => !prev);
+  };
+  useEffect(() => {
+    localStorage.setItem("persist", JSON.stringify(persist));
+  }, [persist]);
+
   ////jsx
   return (
     <Fragment>
@@ -152,6 +161,17 @@ const Login = () => {
                     additionalClass=""
                     formik={formik}
                   />
+                </div>
+                <div>
+                  <input
+                    type="checkbox"
+                    id="persist"
+                    onChange={togglePersistHandler}
+                    checked={persist}
+                  />
+                  <label htmlFor="persist" className="ml-2">
+                    Zaufane urządzenie
+                  </label>
                 </div>
                 <div className="pt-6">
                   <Button

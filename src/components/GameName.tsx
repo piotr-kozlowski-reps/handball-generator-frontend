@@ -33,12 +33,19 @@ const GameName = () => {
   ////CRUD
   const { mutate: postGameName, isLoading: isLoadingPost } = usePostData(
     ADDRESS,
-    QUERY_KEY
+    QUERY_KEY,
+    () => {} //TODO:
   );
   const { mutate: deleteGameName, isLoading: isDeletingPost } = useDeleteData(
     ADDRESS,
     QUERY_KEY,
-    location
+    (error) => {
+      showNotification({
+        status: "error",
+        title: "Błąd",
+        message: `Nie udało się skasować rozgrywek. Error: ${error}`,
+      });
+    }
   );
   const { data, isLoading: isLoadingGet } = useGetData(
     ADDRESS,
@@ -99,15 +106,15 @@ const GameName = () => {
       },
       onError: (error) => {
         const axiosReadableError: AxiosError = error as AxiosError;
-        if (
-          axiosReadableError.response?.status === 401 ||
-          axiosReadableError.response?.status === 400
-        ) {
+        if (axiosReadableError.response?.status === 401) {
           showNotification(NOTIFICATIONS.NOT_LOGGED);
         } else {
-          showNotification(NOTIFICATIONS.NO_ACCESS);
+          showNotification({
+            status: "error",
+            title: "Błąd",
+            message: `Nie udało się utworzyć rozgrywek. \n Error: ${axiosReadableError.response?.data}`,
+          });
         }
-        navigate("/login", { state: { from: location }, replace: true });
       },
     });
   };

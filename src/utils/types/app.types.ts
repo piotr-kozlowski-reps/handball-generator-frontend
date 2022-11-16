@@ -61,6 +61,15 @@ export interface MatchConfigFormValues {
   opponent: string;
   differentPlace: string | null;
 }
+export interface MatchConfigInterface {
+  date: string;
+  time: string;
+  gameName: GameNameInterface;
+  sponsorsBar: SponsorBarInterface | null;
+  isHost: boolean;
+  opponent: TeamInterface;
+  differentPlace: string | null;
+}
 
 //match-day
 export interface MatchDayFormValues {
