@@ -57,8 +57,6 @@ const Team = () => {
 
   useEffect(() => {
     if (data) {
-      console.log({ data });
-
       setTeams([...data.data]);
     }
   }, [data]);
@@ -175,7 +173,7 @@ const Team = () => {
         validateOnMount={true}
       >
         {(formik: FormikProps<TeamFormValues>) => {
-          // console.log(formik);
+          console.log(formik);
 
           ////jsx
           return (
