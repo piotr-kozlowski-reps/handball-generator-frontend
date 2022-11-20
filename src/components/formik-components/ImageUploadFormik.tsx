@@ -1,4 +1,10 @@
-import React, { useState, useCallback, Fragment, ComponentType } from "react";
+import React, {
+  useState,
+  useCallback,
+  Fragment,
+  ComponentType,
+  useEffect,
+} from "react";
 import { ErrorMessage, Field, FormikProps } from "formik";
 import { useDropzone } from "react-dropzone";
 import TextErrorFormik from "./TextErrorFormik";
@@ -30,9 +36,13 @@ const ImageUploadFormik = (props: Props) => {
 
   //useDropZone - start
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    if (acceptedFiles.length < 0) {
+    console.log("onDrop");
+
+    if (acceptedFiles.length > 0) {
+      console.log("onDrop inside acceptedFiles");
+
       const file = acceptedFiles[0];
-      console.log(file);
+      setFile(file);
     }
   }, []);
 
@@ -41,9 +51,9 @@ const ImageUploadFormik = (props: Props) => {
     getRootProps,
     getInputProps,
     isDragActive,
-    isFocused,
     acceptedFiles,
     fileRejections,
+    isFileDialogActive,
   } = useDropzone({
     accept: { "image/*": [".png", ".jpg", ".jpeg", ".gif"] },
     maxFiles: 1,
@@ -52,14 +62,10 @@ const ImageUploadFormik = (props: Props) => {
   //useDropZone - end
 
   ////func
-  const setErrorAndTouched = () => {
-    formik.setFieldTouched(name, true);
-    formik.setFieldError(name, "Error");
-  };
-
-  const setIsTouchedWhenFocused = () => {
-    formik.setFieldTouched(name, true);
-  };
+  // const setErrorAndTouched = () => {
+  //   formik.setFieldTouched(name, true);
+  //   formik.setFieldError(name, "Error");
+  // };
 
   const setFileInFormik = useCallback(() => {
     formik.setFieldValue(name, file);
@@ -72,46 +78,26 @@ const ImageUploadFormik = (props: Props) => {
   const isErrorPresent = getNestedObject(formik.errors, name);
   const isTouched = getNestedObject(formik.touched, name);
 
-  console.log({ previewUrl });
-  console.log({ isErrorPresent });
-  console.log({ isTouched });
+  /** sets field touched when dialog active or anything dropped on hot area */
+  useEffect(() => {
+    if (isDragActive || isFileDialogActive) formik.setFieldTouched(name);
+  }, [isDragActive, isFileDialogActive]);
+
+  // console.log({ previewUrl });
+  // console.log({ isErrorPresent });
+  // console.log({ isTouched });
 
   ////jsx
   return (
     <Fragment>
-      <div
-        className={
-          isErrorPresent && isTouched
-            ? "thumbnail-admin-form thumbnail-error"
-            : "thumbnail-admin-form "
-        }
-      >
-        <img
-          width="100"
-          height="80"
-          src={previewUrl ? previewUrl : noImagePicked}
-          alt={previewUrl && file ? file.name : "no file selected"}
-          className={isErrorPresent && isTouched ? "image-error" : ""}
-        ></img>
-      </div>
-      <div
-        {...getRootProps()}
-        className="w-30 h-30 bg-appInFocus cursor-pointer "
-      >
-        <input {...getInputProps()} type="file" accept=".jpg,.png,.jpeg,.gif" />
-        <p>tutej pliki</p>
-        <p>{previewUrl}</p>
-        <p>{isErrorPresent}</p>
-        <p>{isTouched}</p>
-      </div>
-      {/* <div className={props.additionalClass ? props.additionalClass : ""}>
+      <div className={props.additionalClass ? props.additionalClass : ""}>
         <label
           htmlFor={name}
           className={`details ${additionalClass ? additionalClass : ""}`}
         >
           {label}
         </label>
-        <div className={`input-box-image`}>
+        <div className={`w-full h-52`}>
           <div
             className={
               isErrorPresent && isTouched
@@ -128,29 +114,39 @@ const ImageUploadFormik = (props: Props) => {
             ></img>
           </div>
 
-          <Field id={name} name={name} style={{ display: "none" }}>
-            <input
-              id={name}
-              name={name}
-              type="file"
-              // onChange={setImageInFormikHandler}
-              // onChange={pickHandler} //
-              // onBlur={onBlur} //
-              style={{ display: "none" }}
-              className={isErrorPresent && isTouched ? "input-invalid" : ""}
-              accept=".jpg,.png,.jpeg,.gif"
-            />
-          </Field>
+          {/* <Field id={name} name={name} style={{ display: "none" }}>
+          <input
+            id={name}
+            name={name}
+            type="file"
+            // onChange={setImageInFormikHandler}
+            // onChange={pickHandler} //
+            // onBlur={onBlur} //
+            style={{ display: "none" }}
+            className={isErrorPresent && isTouched ? "input-invalid" : ""}
+            accept=".jpg,.png,.jpeg,.gif"
+          />
+           </Field> */}
 
           <div
-            className={
-              isDragActive ? "drop-zone drop-zone-active" : "drop-zone"
-            }
-            {...getRootProps()}
+            {...getRootProps({
+              className: isDragActive
+                ? "w-full p-4 border-dotted border-[#333] border-4 m-2 bg-light-gray"
+                : "w-full p-4 border-dotted border-[#aaa] border-2 m-2 bg-light-gray",
+            })}
+            // onBlur={() => {
+            //   console.log("onBlur");
+            //   console.log(formik);
+
+            //   formik.setFieldTouched(name);
+            // }}
+            // onClick={() => {
+            //   console.log("onClick");
+            // }}
           >
             <input {...getInputProps()} />
-            <div className="drop-zone-middle-zone">
-              <p className="center drop-zone-text">
+            <div className="">
+              <p className="">
                 {isDragActive
                   ? "DROP FILE HERE"
                   : !previewUrl
@@ -158,22 +154,22 @@ const ImageUploadFormik = (props: Props) => {
                   : "DROP FILE HERE OR CLICK TO CHANGE CHOSEN FILE"}
                 <br />
                 <span className="">
-                  {props.additionalText
-                    ? props.additionalText
-                    : `(Provide only one file. Formats supported: .jpg .jpeg .png
-                  .gif)`}
-                  {`(Provide only one file. Formats supported: .jpg .jpeg .png
+                  {`(opis jakiś. Formats supported: .jpg .jpeg .png
                   .gif)`}
                 </span>
               </p>
             </div>
           </div>
         </div>
-        <ErrorMessage
-          name={name}
-          component={TextErrorFormik as string | ComponentType<{}> | undefined}
-        />
-      </div> */}
+        <div className="text-xs font-semibold text-appError">
+          <ErrorMessage
+            name={name}
+            component={
+              TextErrorFormik as string | ComponentType<{}> | undefined
+            }
+          />
+        </div>
+      </div>
     </Fragment>
   );
 };

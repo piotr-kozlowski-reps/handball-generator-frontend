@@ -211,8 +211,8 @@ const Team = () => {
                 <div className="w-full p-2">
                   <FormikControl
                     control="image"
-                    label="Application image"
-                    name="appInfo.appImageFull"
+                    label="Herb drużyny"
+                    name="teamCrestImage"
                     additionalText="(Provide only one file. Formats supported: .jpg .jpeg .png
                       .gif. Remember -> Here PhoneImage with 345x701px resolution.)"
                     placeholder=""

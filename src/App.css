@@ -36,3 +36,9 @@
     transform: rotate(360deg);
   }
 }
+
+@layer components {
+  .error-message {
+    @apply text-xs font-semibold text-appError;
+  }
+}
