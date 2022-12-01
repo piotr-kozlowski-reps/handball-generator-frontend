@@ -8,7 +8,7 @@ export interface ILoginFormValues {
 export interface ITeamFormValues {
   teamName: string;
   place: string;
-  teamCrestImage: File | null;
+  teamCrestImage: File[] | null;
 }
 export interface ITeam {
   teamName: string;

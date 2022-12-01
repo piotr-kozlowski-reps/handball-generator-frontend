@@ -217,6 +217,7 @@ const Team = () => {
                       .gif. Remember -> Here PhoneImage with 345x701px resolution.)"
                     placeholder=""
                     additionalClass=""
+                    maxFiles={1}
                     formik={formik}
                   />
                 </div>

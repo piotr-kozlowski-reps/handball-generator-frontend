@@ -18,6 +18,7 @@ interface Props {
   isFocusOn?: boolean;
   additionalText?: string;
   options?: IDropDownOptions[];
+  maxFiles?: number;
   formik: FormikProps<any>;
 }
 

@@ -6,10 +6,11 @@ import React, {
   useEffect,
 } from "react";
 import { ErrorMessage, Field, FormikProps } from "formik";
-import { useDropzone } from "react-dropzone";
+import { FileRejection, useDropzone } from "react-dropzone";
 import TextErrorFormik from "./TextErrorFormik";
 import noImagePicked from "../../images/noimage.jpg";
 import ImagesThumbnailsPreview from "./ImagesThumbnailsPreview";
+import useNotification from "../../hooks/useNotification";
 
 ////func
 const getNestedObject = (obj: any, path: any): any => {
@@ -25,6 +26,7 @@ interface Props {
   name: string;
   additionalClass: string;
   isFocusOn?: boolean;
+  maxFiles?: number;
   formik: FormikProps<any>;
 }
 
@@ -32,26 +34,34 @@ export type IImageWithPreview = File & { preview: string };
 
 const ImageUploadFormik = (props: Props) => {
   //vars
-  const { label, name, additionalClass, formik } = props;
+  const { label, name, additionalClass, maxFiles, formik } = props;
+  const { notification, showNotification } = useNotification();
 
   const [files, setFiles] = useState<IImageWithPreview[] | null>(null);
+  const [rejectedFiles, setRejectedFiles] = useState<FileRejection[] | null>(
+    null
+  );
   const [previewUrl, setPreviewUrl] = useState();
 
   //useDropZone - start
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    console.log("onDrop");
+  const onDrop = useCallback(
+    (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+      console.log("onDrop");
+      console.log({ acceptedFiles });
+      console.log({ fileRejections });
 
-    if (acceptedFiles.length > 0) {
-      console.log("onDrop inside acceptedFiles");
+      if (acceptedFiles.length > 0) {
+        setFiles(
+          acceptedFiles?.map((file) =>
+            Object.assign(file, { preview: URL.createObjectURL(file) })
+          )
+        );
+      }
 
-      // const file = acceptedFiles[0];
-      setFiles(
-        acceptedFiles?.map((file) =>
-          Object.assign(file, { preview: URL.createObjectURL(file) })
-        )
-      );
-    }
-  }, []);
+      setRejectedFiles(fileRejections);
+    },
+    []
+  );
 
   ////useDropZone - start
   const {
@@ -63,16 +73,10 @@ const ImageUploadFormik = (props: Props) => {
     isFileDialogActive,
   } = useDropzone({
     accept: { "image/*": [".png", ".jpg", ".jpeg", ".gif"] },
-    maxFiles: 1,
+    maxFiles: maxFiles || 1,
     onDrop,
   });
   //useDropZone - end
-
-  ////func
-  // const setErrorAndTouched = () => {
-  //   formik.setFieldTouched(name, true);
-  //   formik.setFieldError(name, "Error");
-  // };
 
   const setFileInFormik = useCallback(() => {
     formik.setFieldValue(name, files);
@@ -93,94 +97,63 @@ const ImageUploadFormik = (props: Props) => {
   /** clears data uris to avoid memory leaks*/
   useEffect(() => {
     return () => files?.forEach((file) => URL.revokeObjectURL(file.preview));
-  }, []);
+  }, [files]);
 
-  // console.log({ previewUrl });
-  // console.log({ isErrorPresent });
-  // console.log({ isTouched });
+  /** shows error message if any rejected files appeared */
+  useEffect(() => {
+    if (rejectedFiles && rejectedFiles?.length > 0) {
+      const message = rejectedFiles[0].errors[0].message;
+
+      showNotification({
+        status: "error",
+        title: "Błąd.",
+        message: message,
+      });
+    }
+  }, [rejectedFiles]);
 
   ////jsx
   return (
     <Fragment>
-      <div className={props.additionalClass ? props.additionalClass : ""}>
-        <label
-          htmlFor={name}
-          className={`details ${additionalClass ? additionalClass : ""}`}
-        >
-          {label}
-        </label>
-        <div className={`w-full h-52`}>
-          <ImagesThumbnailsPreview />
-          <div
-            className={
-              isErrorPresent && isTouched
-                ? "thumbnail-admin-form thumbnail-error"
-                : "thumbnail-admin-form "
-            }
-          >
-            <img
-              width="100"
-              height="80"
-              src={previewUrl ? previewUrl : noImagePicked}
-              alt={previewUrl && files ? files[0].name : "no file selected"} //TODO: all files
-              className={isErrorPresent && isTouched ? "image-error" : ""}
-            ></img>
+      <div
+        className={`w-full flex items-center ${
+          additionalClass ? additionalClass : ""
+        }`}
+      >
+        <div className="flex flex-col justify-start min-w-full">
+          <div>
+            <ImagesThumbnailsPreview files={files} />
           </div>
 
-          {/* <Field id={name} name={name} style={{ display: "none" }}>
-          <input
-            id={name}
-            name={name}
-            type="file"
-            // onChange={setImageInFormikHandler}
-            // onChange={pickHandler} //
-            // onBlur={onBlur} //
-            style={{ display: "none" }}
-            className={isErrorPresent && isTouched ? "input-invalid" : ""}
-            accept=".jpg,.png,.jpeg,.gif"
-          />
-           </Field> */}
-
-          <div
-            {...getRootProps({
-              className: isDragActive
-                ? "w-full p-4 border-dotted border-[#333] border-4 m-2 bg-light-gray"
-                : "w-full p-4 border-dotted border-[#aaa] border-2 m-2 bg-light-gray",
-            })}
-            // onBlur={() => {
-            //   console.log("onBlur");
-            //   console.log(formik);
-
-            //   formik.setFieldTouched(name);
-            // }}
-            // onClick={() => {
-            //   console.log("onClick");
-            // }}
-          >
-            <input {...getInputProps()} />
-            <div className="">
-              <p className="">
-                {isDragActive
-                  ? "DROP FILE HERE"
-                  : !previewUrl
-                  ? "DROP FILE HERE OR CLICK TO OPEN FILE BROWSER"
-                  : "DROP FILE HERE OR CLICK TO CHANGE CHOSEN FILE"}
-                <br />
-                <span className="">
-                  {`(opis jakiś. Formats supported: .jpg .jpeg .png
-                  .gif)`}
-                </span>
-              </p>
+          <div className="flex justify-start  min-w-full">
+            <div>
+              <label htmlFor={name} className="text-lg">
+                {label}
+              </label>
+            </div>
+            <div>
+              <div
+                {...getRootProps({
+                  className: isDragActive
+                    ? "w-96 h-32 p-4 border-dotted border-[#333] border-4 m-2 bg-light-gray"
+                    : isErrorPresent && isTouched
+                    ? "w-96 h-32 p-4 border-dotted border-[#aaa] border-2 m-2 bg-appError"
+                    : "w-96 h-32 p-4 border-dotted border-[#aaa] border-2 m-2 bg-light-gray",
+                })}
+              >
+                <input {...getInputProps()} />
+                <p>drop zone</p>
+              </div>
+            </div>
+            <div className="text-xs font-semibold text-appError">
+              <ErrorMessage
+                name={name}
+                component={
+                  TextErrorFormik as string | ComponentType<{}> | undefined
+                }
+              />
             </div>
           </div>
-        </div>
-        <div className="text-xs font-semibold text-appError">
-          <ErrorMessage
-            name={name}
-            component={
-              TextErrorFormik as string | ComponentType<{}> | undefined
-            }
-          />
         </div>
       </div>
     </Fragment>
@@ -188,6 +161,47 @@ const ImageUploadFormik = (props: Props) => {
 };
 
 export default ImageUploadFormik;
+
+//  <div className={props.additionalClass ? props.additionalClass : ""}>
+//    <label
+//      htmlFor={name}
+//      className={`details ${additionalClass ? additionalClass : ""}`}
+//    >
+//      {label}
+//    </label>
+//    <div className={`w-full h-52`}>
+//      <ImagesThumbnailsPreview />
+//      {/* <div
+//             className={
+//               isErrorPresent && isTouched
+//                 ? "thumbnail-admin-form thumbnail-error"
+//                 : "thumbnail-admin-form "
+//             }
+//           >
+//             <img
+//               width="100"
+//               height="80"
+//               src={previewUrl ? previewUrl : noImagePicked}
+//               alt={previewUrl && files ? files[0].name : "no file selected"} //TODO: all files
+//               className={isErrorPresent && isTouched ? "image-error" : ""}
+//             ></img>
+//           </div> */}
+
+//      {/* <Field id={name} name={name} style={{ display: "none" }}>
+//           <input
+//             id={name}
+//             name={name}
+//             type="file"
+//             // onChange={setImageInFormikHandler}
+//             // onChange={pickHandler} //
+//             // onBlur={onBlur} //
+//             style={{ display: "none" }}
+//             className={isErrorPresent && isTouched ? "input-invalid" : ""}
+//             accept=".jpg,.png,.jpeg,.gif"
+//           />
+//            </Field> */}
+
+//  </div>;
 
 // import { Field, ErrorMessage, useFormikContext } from "formik";
 // import TextErrorFormik from "./TextErrorFormik";
