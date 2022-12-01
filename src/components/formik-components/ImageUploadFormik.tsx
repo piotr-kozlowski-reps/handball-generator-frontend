@@ -9,6 +9,7 @@ import { ErrorMessage, Field, FormikProps } from "formik";
 import { useDropzone } from "react-dropzone";
 import TextErrorFormik from "./TextErrorFormik";
 import noImagePicked from "../../images/noimage.jpg";
+import ImagesThumbnailsPreview from "./ImagesThumbnailsPreview";
 
 ////func
 const getNestedObject = (obj: any, path: any): any => {
@@ -27,11 +28,13 @@ interface Props {
   formik: FormikProps<any>;
 }
 
+export type IImageWithPreview = File & { preview: string };
+
 const ImageUploadFormik = (props: Props) => {
   //vars
   const { label, name, additionalClass, formik } = props;
 
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<IImageWithPreview[] | null>(null);
   const [previewUrl, setPreviewUrl] = useState();
 
   //useDropZone - start
@@ -41,8 +44,12 @@ const ImageUploadFormik = (props: Props) => {
     if (acceptedFiles.length > 0) {
       console.log("onDrop inside acceptedFiles");
 
-      const file = acceptedFiles[0];
-      setFile(file);
+      // const file = acceptedFiles[0];
+      setFiles(
+        acceptedFiles?.map((file) =>
+          Object.assign(file, { preview: URL.createObjectURL(file) })
+        )
+      );
     }
   }, []);
 
@@ -68,12 +75,12 @@ const ImageUploadFormik = (props: Props) => {
   // };
 
   const setFileInFormik = useCallback(() => {
-    formik.setFieldValue(name, file);
-  }, [file]);
+    formik.setFieldValue(name, files);
+  }, [files]);
 
   const clearErrorInFormik = useCallback(() => {
     formik.setFieldError(name, undefined);
-  }, [file]);
+  }, [files]);
 
   const isErrorPresent = getNestedObject(formik.errors, name);
   const isTouched = getNestedObject(formik.touched, name);
@@ -82,6 +89,11 @@ const ImageUploadFormik = (props: Props) => {
   useEffect(() => {
     if (isDragActive || isFileDialogActive) formik.setFieldTouched(name);
   }, [isDragActive, isFileDialogActive]);
+
+  /** clears data uris to avoid memory leaks*/
+  useEffect(() => {
+    return () => files?.forEach((file) => URL.revokeObjectURL(file.preview));
+  }, []);
 
   // console.log({ previewUrl });
   // console.log({ isErrorPresent });
@@ -98,6 +110,7 @@ const ImageUploadFormik = (props: Props) => {
           {label}
         </label>
         <div className={`w-full h-52`}>
+          <ImagesThumbnailsPreview />
           <div
             className={
               isErrorPresent && isTouched
@@ -109,7 +122,7 @@ const ImageUploadFormik = (props: Props) => {
               width="100"
               height="80"
               src={previewUrl ? previewUrl : noImagePicked}
-              alt={previewUrl && file ? file.name : "no file selected"}
+              alt={previewUrl && files ? files[0].name : "no file selected"} //TODO: all files
               className={isErrorPresent && isTouched ? "image-error" : ""}
             ></img>
           </div>

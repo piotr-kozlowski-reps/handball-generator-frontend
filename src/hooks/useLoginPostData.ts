@@ -1,8 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { LoginFormValues } from "../utils/types/app.types";
+import { ILoginFormValues } from "../utils/types/app.types";
 
-const postLoginData = (loginData: LoginFormValues) => {
+const postLoginData = (loginData: ILoginFormValues) => {
   console.log(process.env.REACT_APP_BACKEND_URL);
 
   return axios.post(

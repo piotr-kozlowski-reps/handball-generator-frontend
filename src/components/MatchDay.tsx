@@ -3,10 +3,7 @@ import * as Yup from "yup";
 import { Form, Formik, FormikHelpers, FormikProps } from "formik";
 import { useGetData } from "../hooks/useCRUDHelperWithCredentials";
 import Loading from "./ui/Loading";
-import {
-  MatchDayFormValues,
-  MatchDayInterface,
-} from "../utils/types/app.types";
+import { IMatchDayFormValues, IMatchDay } from "../utils/types/app.types";
 import { useLocation } from "react-router-dom";
 import useImage from "use-image";
 
@@ -18,7 +15,7 @@ const ADDRESS = QUERIES_DATA.BACKGROUND_IMAGES.address;
 
 const MatchDay = () => {
   ////vars
-  const [backgrounds, setBackgrounds] = useState<MatchDayInterface[]>([]);
+  const [backgrounds, setBackgrounds] = useState<IMatchDay[]>([]);
   const location = useLocation();
 
   const [imageBackground] = useImage(
@@ -41,15 +38,15 @@ const MatchDay = () => {
   }, [data]);
 
   ////formik
-  const formikInitialValues: MatchDayFormValues = {
+  const formikInitialValues: IMatchDayFormValues = {
     background: "",
   };
   const validationSchema = Yup.object({
     background: Yup.string().required("Wybierz tło."),
   });
   const onSubmitHandler = async (
-    values: MatchDayFormValues,
-    formikHelpers: FormikHelpers<MatchDayFormValues>
+    values: IMatchDayFormValues,
+    formikHelpers: FormikHelpers<IMatchDayFormValues>
   ) => {
     console.log(values);
   };

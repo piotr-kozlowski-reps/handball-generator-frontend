@@ -14,10 +14,7 @@ import Loading from "./ui/Loading";
 import { AxiosError } from "axios";
 import { NOTIFICATIONS } from "../utils/notifications/predefinedNotifications";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  GameNameFormValues,
-  GameNameInterface,
-} from "../utils/types/app.types";
+import { IGameNameFormValues, IGameName } from "../utils/types/app.types";
 
 import { QUERIES_DATA } from "../utils/queriesData/predefinedQueriesData";
 const QUERY_KEY = QUERIES_DATA.GAME_NAMES.queryKey;
@@ -25,7 +22,7 @@ const ADDRESS = QUERIES_DATA.GAME_NAMES.address;
 
 const GameName = () => {
   ////vars
-  const [gameNames, setGameNames] = useState<GameNameInterface[]>([]);
+  const [gameNames, setGameNames] = useState<IGameName[]>([]);
   const { notification, showNotification } = useNotification();
   const navigate = useNavigate();
   const location = useLocation();
@@ -62,7 +59,7 @@ const GameName = () => {
   }, [data]);
 
   ////formik
-  const formikInitialValues: GameNameFormValues = {
+  const formikInitialValues: IGameNameFormValues = {
     gameName: "",
     gameImage: null,
   };
@@ -85,8 +82,8 @@ const GameName = () => {
       }),
   });
   const onSubmitHandler = async (
-    values: GameNameFormValues,
-    formikHelpers: FormikHelpers<GameNameFormValues>
+    values: IGameNameFormValues,
+    formikHelpers: FormikHelpers<IGameNameFormValues>
   ) => {
     console.log(values);
 
@@ -171,7 +168,7 @@ const GameName = () => {
         onSubmit={onSubmitHandler}
         validateOnMount={true}
       >
-        {(formik: FormikProps<GameNameFormValues>) => {
+        {(formik: FormikProps<IGameNameFormValues>) => {
           ////jsx
           return (
             <Form>

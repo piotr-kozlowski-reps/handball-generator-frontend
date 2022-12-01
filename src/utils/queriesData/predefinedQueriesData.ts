@@ -1,21 +1,21 @@
-import { QueryData } from "../types/app.types";
+import { IQueryData } from "../types/app.types";
 
-const backgroundImages: QueryData = {
+const backgroundImages: IQueryData = {
   queryKey: ["background-images"],
   address: "/api/background-image",
 };
 
-const gameNames: QueryData = {
+const gameNames: IQueryData = {
   queryKey: ["game-names"],
   address: "/api/game-name",
 };
 
-const sponsorsBars: QueryData = {
+const sponsorsBars: IQueryData = {
   queryKey: ["sponsors-bar"],
   address: "/api/sponsors-bar",
 };
 
-const teams: QueryData = {
+const teams: IQueryData = {
   queryKey: ["teams"],
   address: "/api/team",
 };

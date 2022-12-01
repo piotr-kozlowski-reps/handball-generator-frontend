@@ -14,8 +14,8 @@ import Loading from "./ui/Loading";
 import { AxiosError } from "axios";
 import { NOTIFICATIONS } from "../utils/notifications/predefinedNotifications";
 import {
-  BackgroundImageFormValues,
-  BackgroundImageInterface,
+  IBackgroundImageFormValues,
+  IBackgroundImage,
 } from "../utils/types/app.types";
 import useRefreshToken from "../hooks/useRefreshToken";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -26,9 +26,9 @@ const ADDRESS = QUERIES_DATA.BACKGROUND_IMAGES.address;
 
 const BackgroundImage = () => {
   ////vars
-  const [backgroundImages, setBackgroundImages] = useState<
-    BackgroundImageInterface[]
-  >([]);
+  const [backgroundImages, setBackgroundImages] = useState<IBackgroundImage[]>(
+    []
+  );
   const { notification, showNotification } = useNotification();
   const navigate = useNavigate();
   const location = useLocation();
@@ -66,7 +66,7 @@ const BackgroundImage = () => {
   }, [data]);
 
   ////formik
-  const formikInitialValues: BackgroundImageFormValues = {
+  const formikInitialValues: IBackgroundImageFormValues = {
     backgroundImageName: "",
     backgroundImage: null,
   };
@@ -89,8 +89,8 @@ const BackgroundImage = () => {
       }),
   });
   const onSubmitHandler = async (
-    values: BackgroundImageFormValues,
-    formikHelpers: FormikHelpers<BackgroundImageFormValues>
+    values: IBackgroundImageFormValues,
+    formikHelpers: FormikHelpers<IBackgroundImageFormValues>
   ) => {
     const formData: any = new FormData();
     formData.append("backgroundImageName", values.backgroundImageName);
@@ -175,7 +175,7 @@ const BackgroundImage = () => {
         onSubmit={onSubmitHandler}
         validateOnMount={true}
       >
-        {(formik: FormikProps<BackgroundImageFormValues>) => {
+        {(formik: FormikProps<IBackgroundImageFormValues>) => {
           ////jsx
           return (
             <Form>

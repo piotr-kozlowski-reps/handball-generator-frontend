@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from "react";
-import { NotificationInterface } from "../utils/types/app.types";
+import { INotification } from "../utils/types/app.types";
 
 ////interfaces
 interface Props {
@@ -7,8 +7,8 @@ interface Props {
 }
 
 interface NotificationProviderInterface {
-  notification: NotificationInterface | null;
-  showNotification: (notificationData: NotificationInterface) => void;
+  notification: INotification | null;
+  showNotification: (notificationData: INotification) => void;
   hideNotification: () => void;
 }
 
@@ -24,10 +24,10 @@ const NotificationContext =
 export const NotificationProvider = ({ children }: Props) => {
   ////vars
   const [activeNotification, setActiveNotification] =
-    useState<NotificationInterface | null>(null);
+    useState<INotification | null>(null);
 
   ////logic
-  const showNotification = (notificationData: NotificationInterface) => {
+  const showNotification = (notificationData: INotification) => {
     setActiveNotification(notificationData);
   };
 

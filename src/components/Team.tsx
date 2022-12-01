@@ -1,7 +1,7 @@
 import { Form, Formik, FormikHelpers, FormikProps } from "formik";
 import React, { Fragment, useEffect, useState } from "react";
 import * as Yup from "yup";
-import { TeamFormValues, TeamInterface } from "../utils/types/app.types";
+import { ITeamFormValues, ITeam } from "../utils/types/app.types";
 import FormikControl from "./formik-components/FormikControl";
 import Button from "./ui/Button";
 import {
@@ -22,7 +22,7 @@ const ADDRESS = QUERIES_DATA.TEAMS.address;
 
 const Team = () => {
   ////vars
-  const [teams, setTeams] = useState<TeamInterface[]>([]);
+  const [teams, setTeams] = useState<ITeam[]>([]);
   const { notification, showNotification } = useNotification();
   const location = useLocation();
   const navigate = useNavigate();
@@ -62,7 +62,7 @@ const Team = () => {
   }, [data]);
 
   ////formik
-  const formikInitialValues: TeamFormValues = {
+  const formikInitialValues: ITeamFormValues = {
     teamName: "",
     place: "",
     teamCrestImage: null,
@@ -83,8 +83,8 @@ const Team = () => {
       }),
   });
   const onSubmitHandler = async (
-    values: TeamFormValues,
-    formikHelpers: FormikHelpers<TeamFormValues>
+    values: ITeamFormValues,
+    formikHelpers: FormikHelpers<ITeamFormValues>
   ) => {
     const formData: any = new FormData();
     formData.append("teamName", values.teamName);
@@ -172,7 +172,7 @@ const Team = () => {
         onSubmit={onSubmitHandler}
         validateOnMount={true}
       >
-        {(formik: FormikProps<TeamFormValues>) => {
+        {(formik: FormikProps<ITeamFormValues>) => {
           console.log(formik);
 
           ////jsx

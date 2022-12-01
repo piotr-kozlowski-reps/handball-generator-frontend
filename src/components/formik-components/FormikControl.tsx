@@ -1,6 +1,9 @@
 import { FormikProps } from "formik";
 import React from "react";
-import { DropDownOptions, LoginFormValues } from "../../utils/types/app.types";
+import {
+  IDropDownOptions,
+  ILoginFormValues,
+} from "../../utils/types/app.types";
 import ImageUploadFormik from "./ImageUploadFormik";
 import InputFormik from "./InputFormik";
 import SelectFormik from "./SelectFormik";
@@ -14,7 +17,7 @@ interface Props {
   additionalClass: string;
   isFocusOn?: boolean;
   additionalText?: string;
-  options?: DropDownOptions[];
+  options?: IDropDownOptions[];
   formik: FormikProps<any>;
 }
 

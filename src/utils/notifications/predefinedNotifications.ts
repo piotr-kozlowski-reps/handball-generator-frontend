@@ -1,12 +1,12 @@
-import { NotificationInterface } from "../types/app.types";
+import { INotification } from "../types/app.types";
 
-const notLoggedNotification: NotificationInterface = {
+const notLoggedNotification: INotification = {
   status: "error",
   title: "Niezalgowany.",
   message: "Niepoprawne dane.",
 };
 
-const noAccessNotification: NotificationInterface = {
+const noAccessNotification: INotification = {
   status: "error",
   title: "Brak dostępu.",
   message: "Brak dostępu do zasobów.",

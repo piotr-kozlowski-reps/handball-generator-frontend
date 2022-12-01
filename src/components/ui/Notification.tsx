@@ -1,10 +1,10 @@
 import React, { Fragment } from "react";
-import { NotificationInterface } from "../../utils/types/app.types";
+import { INotification } from "../../utils/types/app.types";
 import Backdrop from "./Backdrop";
 import ReactDOM from "react-dom";
 
 interface Props {
-  notificationInfo: NotificationInterface;
+  notificationInfo: INotification;
 }
 const NotificationOverlay = (props: Props) => {
   ////vars
@@ -32,7 +32,7 @@ const NotificationOverlay = (props: Props) => {
   );
 };
 
-const Notification = (props: NotificationInterface) => {
+const Notification = (props: INotification) => {
   ////jsx
   return (
     <Fragment>

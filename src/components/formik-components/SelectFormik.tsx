@@ -1,7 +1,7 @@
 import React, { ComponentType, Fragment, useState } from "react";
 import { Field, ErrorMessage, FormikProps } from "formik";
 import TextErrorFormik from "./TextErrorFormik";
-import { DropDownOptions } from "../../utils/types/app.types";
+import { IDropDownOptions } from "../../utils/types/app.types";
 // import { useStateContext } from "../../context/ContextProvider";
 
 ////func
@@ -17,7 +17,7 @@ interface Props {
   name: string;
   additionalClass: string;
   isFocusOn?: boolean;
-  options: DropDownOptions[];
+  options: IDropDownOptions[];
   formik: FormikProps<any>;
 }
 // };

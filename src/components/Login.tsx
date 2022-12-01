@@ -1,8 +1,5 @@
 import React, { Fragment, useEffect, useRef } from "react";
-import {
-  LoginFormValues,
-  NotificationInterface,
-} from "../utils/types/app.types";
+import { ILoginFormValues, INotification } from "../utils/types/app.types";
 import * as Yup from "yup";
 import { Formik, Form, FormikHelpers, FormikProps } from "formik";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -29,7 +26,7 @@ const Login = () => {
   const from = location.state?.from?.pathname || "/";
 
   ////formik
-  const formikInitialValues: LoginFormValues = {
+  const formikInitialValues: ILoginFormValues = {
     userName: "",
     password: "",
   };
@@ -46,10 +43,10 @@ const Login = () => {
     }),
   });
   const onSubmitHandler = async (
-    values: LoginFormValues,
-    formikHelpers: FormikHelpers<LoginFormValues>
+    values: ILoginFormValues,
+    formikHelpers: FormikHelpers<ILoginFormValues>
   ) => {
-    const loginBody: LoginFormValues = {
+    const loginBody: ILoginFormValues = {
       userName: values.userName,
       password: values.password,
     };
@@ -125,7 +122,7 @@ const Login = () => {
         onSubmit={onSubmitHandler}
         validateOnMount={true}
       >
-        {(formik: FormikProps<LoginFormValues>) => {
+        {(formik: FormikProps<ILoginFormValues>) => {
           ////jsx
           return (
             <Form>

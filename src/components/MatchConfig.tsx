@@ -10,12 +10,12 @@ import { NOTIFICATIONS } from "../utils/notifications/predefinedNotifications";
 import { useLocation, useNavigate } from "react-router-dom";
 import { QUERIES_DATA } from "../utils/queriesData/predefinedQueriesData";
 import {
-  DropDownOptions,
-  GameNameInterface,
-  MatchConfigFormValues,
-  MatchConfigInterface,
+  IDropDownOptions,
+  IGameName,
+  IMatchConfigFormValues,
+  IMatchConfig,
   SponsorBarInterface,
-  TeamInterface,
+  ITeam,
 } from "../utils/types/app.types";
 import { useGetData } from "../hooks/useCRUDHelperWithCredentials";
 import useAxiosPrivateJSON from "../hooks/useAxiosPrivateJSON";
@@ -32,9 +32,9 @@ const ADDRESS_TEAMS = QUERIES_DATA.TEAMS.address;
 
 const MatchConfig = () => {
   ////vars
-  const [gameNames, setGameNames] = useState<GameNameInterface[]>([]);
+  const [gameNames, setGameNames] = useState<IGameName[]>([]);
   const [sponsorsBars, setSponsorsBars] = useState<SponsorBarInterface[]>([]);
-  const [teams, setTeams] = useState<TeamInterface[]>([]);
+  const [teams, setTeams] = useState<ITeam[]>([]);
 
   const axiosPrivate = useAxiosPrivateJSON();
 
@@ -77,34 +77,34 @@ const MatchConfig = () => {
 
   ////data for selects
   //game names
-  const optionsGameNames: DropDownOptions[] = gameNames.map((gameName) => {
+  const optionsGameNames: IDropDownOptions[] = gameNames.map((gameName) => {
     return { key: gameName.gameName, value: gameName._id };
   });
-  const dropDownGameNamesOptions: DropDownOptions[] = [
+  const dropDownGameNamesOptions: IDropDownOptions[] = [
     { key: "wybierz rodzaj rozgrywek:", value: "" },
     ...optionsGameNames,
   ];
   //sponsors bars
-  const optionsSponsorsBars: DropDownOptions[] = sponsorsBars.map(
+  const optionsSponsorsBars: IDropDownOptions[] = sponsorsBars.map(
     (sponsorBar) => {
       return { key: sponsorBar.barName, value: sponsorBar._id };
     }
   );
-  const dropDownSponsorsBarsOptions: DropDownOptions[] = [
+  const dropDownSponsorsBarsOptions: IDropDownOptions[] = [
     { key: "bez belki sponsora", value: "" },
     ...optionsSponsorsBars,
   ];
   //teams
-  const optionsTeams: DropDownOptions[] = teams.map((team) => {
+  const optionsTeams: IDropDownOptions[] = teams.map((team) => {
     return { key: team.teamName, value: team._id };
   });
-  const dropDownTeamsOptions: DropDownOptions[] = [
+  const dropDownTeamsOptions: IDropDownOptions[] = [
     { key: "wybierz drużynę przeciwnika:", value: "" },
     ...optionsTeams,
   ];
 
   ////formik
-  const formikInitialValues: MatchConfigFormValues = {
+  const formikInitialValues: IMatchConfigFormValues = {
     date: "",
     time: "",
     gameName: "",
@@ -119,12 +119,12 @@ const MatchConfig = () => {
     gameName: Yup.string().required("Podaj rodzaj rozgrywek."),
     opponent: Yup.string().required("Podaj nazwę przeciwnika."),
   });
-  const cancelFormHandler = (formik: FormikProps<MatchConfigFormValues>) => {
+  const cancelFormHandler = (formik: FormikProps<IMatchConfigFormValues>) => {
     formik.resetForm();
   };
   const onSubmitHandler = async (
-    values: MatchConfigFormValues,
-    formikHelpers: FormikHelpers<MatchConfigFormValues>
+    values: IMatchConfigFormValues,
+    formikHelpers: FormikHelpers<IMatchConfigFormValues>
   ) => {
     console.log(values);
 
@@ -153,7 +153,7 @@ const MatchConfig = () => {
       });
       return;
     }
-    const finalObjectToBeSavedInLocalStorage: MatchConfigInterface = {
+    const finalObjectToBeSavedInLocalStorage: IMatchConfig = {
       date: values.date,
       time: values.time,
       gameName: fetchedGameName.data.gameName,
@@ -188,7 +188,7 @@ const MatchConfig = () => {
         onSubmit={onSubmitHandler}
         validateOnMount={true}
       >
-        {(formik: FormikProps<MatchConfigFormValues>) => {
+        {(formik: FormikProps<IMatchConfigFormValues>) => {
           ////jsx
           return (
             <Form>

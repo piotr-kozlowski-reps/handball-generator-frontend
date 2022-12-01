@@ -2,7 +2,7 @@ import React, { useState, useEffect, Fragment } from "react";
 import { Form, Formik, FormikHelpers, FormikProps } from "formik";
 import useNotification from "../hooks/useNotification";
 import {
-  SponsorBarFormValues,
+  ISponsorBarFormValues,
   SponsorBarInterface,
 } from "../utils/types/app.types";
 import {
@@ -65,7 +65,7 @@ const Sponsors = () => {
   }, [data]);
 
   ////formik
-  const formikInitialValues: SponsorBarFormValues = {
+  const formikInitialValues: ISponsorBarFormValues = {
     barName: "",
     sponsorsBarImage: null,
   };
@@ -89,8 +89,8 @@ const Sponsors = () => {
   });
 
   const onSubmitHandler = async (
-    values: SponsorBarFormValues,
-    formikHelpers: FormikHelpers<SponsorBarFormValues>
+    values: ISponsorBarFormValues,
+    formikHelpers: FormikHelpers<ISponsorBarFormValues>
   ) => {
     // console.log(values);
 
@@ -175,7 +175,7 @@ const Sponsors = () => {
         onSubmit={onSubmitHandler}
         validateOnMount={true}
       >
-        {(formik: FormikProps<SponsorBarFormValues>) => {
+        {(formik: FormikProps<ISponsorBarFormValues>) => {
           console.log(formik);
 
           ////jsx

@@ -1,16 +1,16 @@
 ////formik
-export interface LoginFormValues {
+export interface ILoginFormValues {
   userName: string;
   password: string;
 }
 
 //team
-export interface TeamFormValues {
+export interface ITeamFormValues {
   teamName: string;
   place: string;
   teamCrestImage: File | null;
 }
-export interface TeamInterface {
+export interface ITeam {
   teamName: string;
   place: string;
   teamCrestImage: string;
@@ -18,7 +18,7 @@ export interface TeamInterface {
 }
 
 //sponsors-bar
-export interface SponsorBarFormValues {
+export interface ISponsorBarFormValues {
   barName: string;
   sponsorsBarImage: File | null;
 }
@@ -29,30 +29,30 @@ export interface SponsorBarInterface {
 }
 
 //background-image
-export interface BackgroundImageInterface {
+export interface IBackgroundImage {
   backgroundImageName: string;
   backgroundImage: string;
   backgroundImageThumbnail: string;
   _id: string;
 }
-export interface BackgroundImageFormValues {
+export interface IBackgroundImageFormValues {
   backgroundImageName: string;
   backgroundImage: File | null;
 }
 
 //game-name
-export interface GameNameInterface {
+export interface IGameName {
   gameName: string;
   gameImage: string;
   _id: string;
 }
-export interface GameNameFormValues {
+export interface IGameNameFormValues {
   gameName: string;
   gameImage: File | null;
 }
 
 //match-config
-export interface MatchConfigFormValues {
+export interface IMatchConfigFormValues {
   date: string;
   time: string;
   gameName: string;
@@ -61,38 +61,38 @@ export interface MatchConfigFormValues {
   opponent: string;
   differentPlace: string | null;
 }
-export interface MatchConfigInterface {
+export interface IMatchConfig {
   date: string;
   time: string;
-  gameName: GameNameInterface;
+  gameName: IGameName;
   sponsorsBar: SponsorBarInterface | null;
   isHost: boolean;
-  opponent: TeamInterface;
+  opponent: ITeam;
   differentPlace: string | null;
 }
 
 //match-day
-export interface MatchDayFormValues {
+export interface IMatchDayFormValues {
   background: string;
 }
-export interface MatchDayInterface {
+export interface IMatchDay {
   background: string;
   _id: string;
 }
 
 ////
-export interface NotificationInterface {
+export interface INotification {
   title: string;
   message: string;
   status: "success" | "error";
 }
 
-export interface QueryData {
+export interface IQueryData {
   queryKey: string[];
   address: string;
 }
 
-export interface DropDownOptions {
+export interface IDropDownOptions {
   key: string;
   value: string;
 }
