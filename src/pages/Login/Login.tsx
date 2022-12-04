@@ -1,20 +1,20 @@
 import React, { Fragment, useEffect, useRef } from "react";
-import { ILoginFormValues, INotification } from "../utils/types/app.types";
+import { ILoginFormValues, INotification } from "../../utils/types/app.types";
 import * as Yup from "yup";
 import { Formik, Form, FormikHelpers, FormikProps } from "formik";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AxiosError, AxiosResponse } from "axios";
-import useLocalStorage from "../hooks/useLocalStorage";
+import useLocalStorage from "../../hooks/useLocalStorage";
 
-import herb from "../images/gornik-logo-01.png";
+import herb from "../../assets/gornik-logo-01.png";
 
-import FormikControl from "./formik-components/FormikControl";
-import Button from "./ui/Button";
-import { usePostData } from "../hooks/useCRUDHelper";
-import useAuth from "../hooks/useAuth";
-import useNotification from "../hooks/useNotification";
-import Loading from "./ui/Loading";
-import Notification from "./ui/Notification";
+import FormikControl from "../../components/formik-components/FormikControl";
+import Button from "../../components/ui/Button";
+import { usePostData } from "../../hooks/useCRUDHelper";
+import useAuth from "../../hooks/useAuth";
+import useNotification from "../../hooks/useNotification";
+import Loading from "../../components/ui/Loading";
+import Notification from "../../components/ui/Notification";
 
 const Login = () => {
   ////vars

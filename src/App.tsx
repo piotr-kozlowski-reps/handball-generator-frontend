@@ -1,15 +1,15 @@
 import React, { Fragment } from "react";
 import { Routes, Route } from "react-router-dom";
 
-import Login from "./components/Login";
+import Login from "./pages/Login/Login";
 import Layout from "./components/Layout";
 import Unauthorized from "./components/Unauthorized";
 import Missing from "./components/Missing";
 import PersistLogin from "./components/PersistLogin";
 import RequireAuth from "./components/RequireAuth";
 import Home from "./components/Home";
-import Team from "./components/Team";
-import BackgroundImage from "./components/BackgroundImage";
+import Teams from "./pages/Teams/index";
+import BackgroundImage from "./pages/BackgroundImage";
 import Sponsors from "./components/Sponsors";
 import GameName from "./components/GameName";
 import MatchDay from "./components/MatchDay";
@@ -38,7 +38,7 @@ const App: React.FC = () => {
             element={<RequireAuth allowedRoles={[ROLES.Admin, ROLES.User]} />}
           >
             <Route path="/" element={<Home />} />
-            <Route path="/team" element={<Team />} />
+            <Route path="/team" element={<Teams />} />
             <Route path="/background-image" element={<BackgroundImage />} />
             <Route path="/game-name" element={<GameName />} />
             <Route path="/sponsors" element={<Sponsors />} />

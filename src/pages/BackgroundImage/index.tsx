@@ -1,25 +1,25 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { Form, Formik, FormikHelpers, FormikProps } from "formik";
-import useNotification from "../hooks/useNotification";
+import useNotification from "../../hooks/useNotification";
 import {
   usePostData,
   useGetData,
   useDeleteData,
-} from "../hooks/useCRUDHelperWithCredentials";
+} from "../../hooks/useCRUDHelperWithCredentials";
 import * as Yup from "yup";
-import Notification from "./ui/Notification";
-import FormikControl from "./formik-components/FormikControl";
-import Button from "./ui/Button";
-import Loading from "./ui/Loading";
+import Notification from "../../components/ui/Notification";
+import FormikControl from "../../components/formik-components/FormikControl";
+import Button from "../../components/ui/Button";
+import Loading from "../../components/ui/Loading";
 import { AxiosError } from "axios";
-import { NOTIFICATIONS } from "../utils/notifications/predefinedNotifications";
+import { NOTIFICATIONS } from "../../utils/notifications/predefinedNotifications";
 import {
   IBackgroundImageFormValues,
   IBackgroundImage,
-} from "../utils/types/app.types";
-import useRefreshToken from "../hooks/useRefreshToken";
+} from "../../utils/types/app.types";
+import useRefreshToken from "../../hooks/useRefreshToken";
 import { useLocation, useNavigate } from "react-router-dom";
-import { QUERIES_DATA } from "../utils/queriesData/predefinedQueriesData";
+import { QUERIES_DATA } from "../../utils/queriesData/predefinedQueriesData";
 
 const QUERY_KEY = QUERIES_DATA.BACKGROUND_IMAGES.queryKey;
 const ADDRESS = QUERIES_DATA.BACKGROUND_IMAGES.address;

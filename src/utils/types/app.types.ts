@@ -1,3 +1,5 @@
+import { type } from "os";
+
 ////formik
 export interface ILoginFormValues {
   userName: string;
@@ -96,3 +98,5 @@ export interface IDropDownOptions {
   key: string;
   value: string;
 }
+
+export type IAccept = { [key: string]: string[] };

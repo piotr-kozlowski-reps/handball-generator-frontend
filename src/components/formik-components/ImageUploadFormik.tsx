@@ -11,6 +11,7 @@ import TextErrorFormik from "./TextErrorFormik";
 import noImagePicked from "../../images/noimage.jpg";
 import ImagesThumbnailsPreview from "./ImagesThumbnailsPreview";
 import useNotification from "../../hooks/useNotification";
+import { IAccept } from "../../utils/types/app.types";
 
 ////func
 const getNestedObject = (obj: any, path: any): any => {
@@ -27,6 +28,8 @@ interface Props {
   additionalClass: string;
   isFocusOn?: boolean;
   maxFiles?: number;
+  /** example form: { "image/*": [".png", ".jpg", ".jpeg", ".gif"] } */
+  accept?: IAccept;
   formik: FormikProps<any>;
 }
 
@@ -34,53 +37,51 @@ export type IImageWithPreview = File & { preview: string };
 
 const ImageUploadFormik = (props: Props) => {
   //vars
-  const { label, name, additionalClass, maxFiles, formik } = props;
+  const { label, name, additionalClass, maxFiles, accept, formik } = props;
   const { notification, showNotification } = useNotification();
 
   const [files, setFiles] = useState<IImageWithPreview[] | null>(null);
   const [rejectedFiles, setRejectedFiles] = useState<FileRejection[] | null>(
     null
   );
-  const [previewUrl, setPreviewUrl] = useState();
 
   //useDropZone - start
   const onDrop = useCallback(
     (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-      console.log("onDrop");
-      console.log({ acceptedFiles });
       console.log({ fileRejections });
+      console.log({ acceptedFiles });
 
       if (acceptedFiles.length > 0) {
+        formik.setFieldValue(name, acceptedFiles);
         setFiles(
-          acceptedFiles?.map((file) =>
+          acceptedFiles.map((file) =>
             Object.assign(file, { preview: URL.createObjectURL(file) })
           )
         );
+        // setFiles(
+        //   acceptedFiles.map((file) =>
+        //     Object.assign(file, { preview: URL.createObjectURL(file) })
+        //   )
+        // );
       }
 
-      setRejectedFiles(fileRejections);
+      if (fileRejections.length > 0) {
+        formik.setFieldValue(name, null);
+        setRejectedFiles(fileRejections);
+        setFiles(null);
+      }
     },
     []
   );
 
   ////useDropZone - start
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    acceptedFiles,
-    fileRejections,
-    isFileDialogActive,
-  } = useDropzone({
-    accept: { "image/*": [".png", ".jpg", ".jpeg", ".gif"] },
-    maxFiles: maxFiles || 1,
-    onDrop,
-  });
+  const { getRootProps, getInputProps, isDragActive, isFileDialogActive } =
+    useDropzone({
+      accept: accept,
+      maxFiles: maxFiles || 1,
+      onDrop,
+    });
   //useDropZone - end
-
-  const setFileInFormik = useCallback(() => {
-    formik.setFieldValue(name, files);
-  }, [files]);
 
   const clearErrorInFormik = useCallback(() => {
     formik.setFieldError(name, undefined);
@@ -102,6 +103,8 @@ const ImageUploadFormik = (props: Props) => {
   /** shows error message if any rejected files appeared */
   useEffect(() => {
     if (rejectedFiles && rejectedFiles?.length > 0) {
+      console.log("showing notification");
+
       const message = rejectedFiles[0].errors[0].message;
 
       showNotification({

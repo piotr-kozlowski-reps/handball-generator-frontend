@@ -1,22 +1,26 @@
 import { Form, Formik, FormikHelpers, FormikProps } from "formik";
 import React, { Fragment, useEffect, useState } from "react";
 import * as Yup from "yup";
-import { ITeamFormValues, ITeam } from "../utils/types/app.types";
-import FormikControl from "./formik-components/FormikControl";
-import Button from "./ui/Button";
+import { ITeamFormValues, ITeam } from "../../utils/types/app.types";
+import FormikControl from "../../components/formik-components/FormikControl";
+import Button from "../../components/ui/Button";
 import {
   usePostData,
   useGetData,
   useDeleteData,
-} from "../hooks/useCRUDHelperWithCredentials";
-import Loading from "./ui/Loading";
+} from "../../hooks/useCRUDHelperWithCredentials";
+import Loading from "../../components/ui/Loading";
 import { AxiosError } from "axios";
-import useNotification from "../hooks/useNotification";
-import Notification from "./ui/Notification";
-import { NOTIFICATIONS } from "../utils/notifications/predefinedNotifications";
+import useNotification from "../../hooks/useNotification";
+import Notification from "../../components/ui/Notification";
+import { NOTIFICATIONS } from "../../utils/notifications/predefinedNotifications";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { QUERIES_DATA } from "../utils/queriesData/predefinedQueriesData";
+import { QUERIES_DATA } from "../../utils/queriesData/predefinedQueriesData";
+import {
+  SendImagesStrategy,
+  SendOnlyImage,
+} from "../../utils/sendImagesStrategy";
 const QUERY_KEY = QUERIES_DATA.TEAMS.queryKey;
 const ADDRESS = QUERIES_DATA.TEAMS.address;
 
@@ -79,7 +83,10 @@ const Team = () => {
       .test({
         name: "type",
         message: "Herb drużyny musi być plikiem PNG.",
-        test: (value) => value && value.type === "image/png",
+        test: (value) => {
+          console.log({ value });
+          return value && value[0].type === "image/png";
+        },
       }),
   });
   const onSubmitHandler = async (
@@ -89,7 +96,12 @@ const Team = () => {
     const formData: any = new FormData();
     formData.append("teamName", values.teamName);
     formData.append("place", values.place);
-    formData.append("teamCrestImage", values.teamCrestImage);
+    formData.append(
+      "teamCrestImage",
+      SendImagesStrategy.prepareImageOrArrayOfImages(SendOnlyImage).sendImage(
+        values.teamCrestImage
+      )
+    );
 
     postForm(formData, {
       onSuccess: (data) => {
@@ -101,6 +113,7 @@ const Team = () => {
         });
         formikHelpers.setSubmitting(false);
         formikHelpers.resetForm();
+        setTeams([]);
       },
       onError: (error) => {
         const axiosReadableError: AxiosError = error as AxiosError;
@@ -218,6 +231,7 @@ const Team = () => {
                     placeholder=""
                     additionalClass=""
                     maxFiles={1}
+                    accept={{ "image/png": [".png"] }}
                     formik={formik}
                   />
                 </div>

@@ -1,6 +1,7 @@
 import { FormikProps } from "formik";
 import React from "react";
 import {
+  IAccept,
   IDropDownOptions,
   ILoginFormValues,
 } from "../../utils/types/app.types";
@@ -19,6 +20,8 @@ interface Props {
   additionalText?: string;
   options?: IDropDownOptions[];
   maxFiles?: number;
+  /** example form: { "image/*": [".png", ".jpg", ".jpeg", ".gif"] } */
+  accept?: IAccept;
   formik: FormikProps<any>;
 }
 
