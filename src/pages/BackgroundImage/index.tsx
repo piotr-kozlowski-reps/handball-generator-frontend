@@ -68,33 +68,55 @@ const BackgroundImage = () => {
   ////formik
   const formikInitialValues: IBackgroundImageFormValues = {
     backgroundImageName: "",
-    backgroundImage: null,
+    backgroundImages: null,
   };
   const validationSchema = Yup.object({
     backgroundImageName: Yup.string().required("Nazwa tła jest wymagana."),
-    backgroundImage: Yup.mixed()
+    backgroundImages: Yup.mixed()
       .test({
         name: "required",
-        message: "Obrazek tła jest wymagany.",
+        message: "Obrazek/obrazki tła są wymagane.",
         test: (value) => value !== null,
       })
       .test({
         name: "type",
-        message: "Obrazek tła musi być plikiem PNG/JPG/JPEG.",
-        test: (value) =>
-          value &&
-          (value.type === "image/png" ||
-            value.type === "image/jpg" ||
-            value.type === "image/jpeg"),
+        message: "Obrazki tła muszą być plikami PNG/JPG/JPEG.",
+        test: (value) => {
+          console.log({ value });
+
+          if (!value) return false;
+          console.log("isArray: ", Array.isArray(value));
+
+          let isImageCorrect = true;
+          value.forEach((file: File) => {
+            isImageCorrect =
+              isImageCorrect &&
+              (file.type === "image/png" ||
+                file.type === "image/jpg" ||
+                file.type === "image/jpeg");
+          });
+
+          console.log({ isImageCorrect });
+
+          return isImageCorrect;
+        },
       }),
   });
+
   const onSubmitHandler = async (
     values: IBackgroundImageFormValues,
     formikHelpers: FormikHelpers<IBackgroundImageFormValues>
   ) => {
+    console.log({ values });
+
     const formData: any = new FormData();
     formData.append("backgroundImageName", values.backgroundImageName);
-    formData.append("backgroundImage", values.backgroundImage);
+    if (values.backgroundImages && Array.isArray(values.backgroundImages)) {
+      values.backgroundImages.forEach((image) => {
+        formData.append("backgroundImages", image);
+      });
+    }
+
     postBackgroundImage(formData, {
       onSuccess: (data) => {
         console.log(data.data);
@@ -176,6 +198,8 @@ const BackgroundImage = () => {
         validateOnMount={true}
       >
         {(formik: FormikProps<IBackgroundImageFormValues>) => {
+          console.log({ formik });
+
           ////jsx
           return (
             <Form>
@@ -200,13 +224,14 @@ const BackgroundImage = () => {
 
                 <div className="w-full p-2">
                   <input
-                    id="backgroundImage"
-                    name="backgroundImage"
+                    multiple
+                    id="backgroundImages"
+                    name="backgroundImages"
                     type="file"
                     onChange={(event) => {
                       formik.setFieldValue(
-                        "backgroundImage",
-                        event?.currentTarget?.files?.[0]
+                        "backgroundImages",
+                        event?.currentTarget?.files
                       );
                     }}
                   />
