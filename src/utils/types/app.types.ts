@@ -38,8 +38,8 @@ export interface IBackgroundImage {
   _id: string;
 }
 export interface IBackgroundImageFormValues {
-  backgroundImageName: string;
-  backgroundImages: File[] | null;
+  // backgroundImageName: string;
+  backgroundImages: FileList | null;
 }
 
 //game-name

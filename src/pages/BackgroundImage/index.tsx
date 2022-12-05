@@ -67,11 +67,11 @@ const BackgroundImage = () => {
 
   ////formik
   const formikInitialValues: IBackgroundImageFormValues = {
-    backgroundImageName: "",
+    // backgroundImageName: "",
     backgroundImages: null,
   };
   const validationSchema = Yup.object({
-    backgroundImageName: Yup.string().required("Nazwa tła jest wymagana."),
+    // backgroundImageName: Yup.string().required("Nazwa tła jest wymagana."),
     backgroundImages: Yup.mixed()
       .test({
         name: "required",
@@ -82,21 +82,17 @@ const BackgroundImage = () => {
         name: "type",
         message: "Obrazki tła muszą być plikami PNG/JPG/JPEG.",
         test: (value) => {
-          console.log({ value });
-
           if (!value) return false;
-          console.log("isArray: ", Array.isArray(value));
 
           let isImageCorrect = true;
-          value.forEach((file: File) => {
+          for (let i = 0; i < value.length; i++) {
+            const file = value.item(i);
             isImageCorrect =
               isImageCorrect &&
               (file.type === "image/png" ||
                 file.type === "image/jpg" ||
                 file.type === "image/jpeg");
-          });
-
-          console.log({ isImageCorrect });
+          }
 
           return isImageCorrect;
         },
@@ -110,11 +106,15 @@ const BackgroundImage = () => {
     console.log({ values });
 
     const formData: any = new FormData();
-    formData.append("backgroundImageName", values.backgroundImageName);
-    if (values.backgroundImages && Array.isArray(values.backgroundImages)) {
-      values.backgroundImages.forEach((image) => {
-        formData.append("backgroundImages", image);
-      });
+    // formData.append("backgroundImageName", values.backgroundImageName);
+
+    //files
+    const fileList = values.backgroundImages;
+    if (fileList) {
+      for (let i = 0; i < fileList.length; i++) {
+        const file = fileList.item(i);
+        formData.append("backgroundImages", file);
+      }
     }
 
     postBackgroundImage(formData, {
@@ -122,8 +122,8 @@ const BackgroundImage = () => {
         console.log(data.data);
         showNotification({
           status: "success",
-          title: "Dodano obrazek tła.",
-          message: `Dodany obrazek tła:\nnazwa: ${data.data.result.backgroundImageName}\nobrazek: ${data.data.result.backgroundImage}`,
+          title: "Dodano obrazek/obrazki tła.",
+          message: `Dodany obrazek/obrazki tła.`,
         });
         formikHelpers.setSubmitting(false);
         formikHelpers.resetForm();
@@ -206,10 +206,10 @@ const BackgroundImage = () => {
               <div className="w-96 h-screen flex flex-col justify-center items-center">
                 <div className="pt-12">
                   <span className="font-bold uppercase text-xl">
-                    Wprowadź tło/tła (później)
+                    Wprowadź tło/tła
                   </span>
                 </div>
-                <div className="w-full p-2">
+                {/* <div className="w-full p-2">
                   <FormikControl
                     control="input"
                     type="text"
@@ -220,7 +220,7 @@ const BackgroundImage = () => {
                     isFocusOn={true}
                     formik={formik}
                   />
-                </div>
+                </div> */}
 
                 <div className="w-full p-2">
                   <input
