@@ -82,21 +82,38 @@ const BackgroundImage = () => {
         name: "type",
         message: "Obrazki tła muszą być plikami PNG/JPG/JPEG.",
         test: (value) => {
-          if (!value) return false;
-
-          let isImageCorrect = true;
-          for (let i = 0; i < value.length; i++) {
-            const file = value.item(i);
-            isImageCorrect =
-              isImageCorrect &&
-              (file.type === "image/png" ||
-                file.type === "image/jpg" ||
-                file.type === "image/jpeg");
-          }
-
-          return isImageCorrect;
+          let areImagesCorrect = true;
+          const files = value as File[];
+          files.forEach((file) => {
+            areImagesCorrect =
+              areImagesCorrect &&
+              (file?.type === "image/png" ||
+                file?.type === "image/jpg" ||
+                file?.type === "image/jpeg");
+          });
+          return areImagesCorrect;
         },
       }),
+    // .test({
+    //   name: "type",
+    //   message: "Obrazki tła muszą być plikami PNG/JPG/JPEG.",
+    //   test: (value) => {
+    //     let isImageCorrect = true;
+    //     const filesContainer = value as FileList;
+    //     if (!filesContainer) return false;
+
+    //     for (let i = 0; i < filesContainer.length; i++) {
+    //       const file = filesContainer.item(i);
+    //       isImageCorrect =
+    //         isImageCorrect &&
+    //         (file?.type === "image/png" ||
+    //           file?.type === "image/jpg" ||
+    //           file?.type === "image/jpeg");
+    //     }
+
+    //     return isImageCorrect;
+    //   },
+    // }),
   });
 
   const onSubmitHandler = async (
@@ -223,6 +240,21 @@ const BackgroundImage = () => {
                 </div> */}
 
                 <div className="w-full p-2">
+                  <FormikControl
+                    control="image"
+                    label="Pliki tła"
+                    name="backgroundImages"
+                    // additionalText="(Provide only one file. Formats supported: .jpg .jpeg .png
+                    //   .gif. Remember -> Here PhoneImage with 345x701px resolution.)"
+                    placeholder=""
+                    additionalClass=""
+                    maxFiles={100}
+                    accept={{ "image/*": [".png", ".jpg", ".jpeg", ".gif"] }}
+                    formik={formik}
+                  />
+                </div>
+
+                {/* <div className="w-full p-2">
                   <input
                     multiple
                     id="backgroundImages"
@@ -235,7 +267,7 @@ const BackgroundImage = () => {
                       );
                     }}
                   />
-                </div>
+                </div> */}
 
                 <div className="pt-6">
                   <Button
