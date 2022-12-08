@@ -39,7 +39,7 @@ export interface IBackgroundImage {
 }
 export interface IBackgroundImageFormValues {
   // backgroundImageName: string;
-  backgroundImages: FileList | null;
+  backgroundImages: File[] | null;
 }
 
 //game-name

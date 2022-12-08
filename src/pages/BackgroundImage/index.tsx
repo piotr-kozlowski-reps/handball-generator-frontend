@@ -123,15 +123,15 @@ const BackgroundImage = () => {
     console.log({ values });
 
     const formData: any = new FormData();
-    // formData.append("backgroundImageName", values.backgroundImageName);
 
     //files
     const fileList = values.backgroundImages;
     if (fileList) {
-      for (let i = 0; i < fileList.length; i++) {
-        const file = fileList.item(i);
-        formData.append("backgroundImages", file);
-      }
+      fileList.forEach((file) => formData.append("backgroundImages", file));
+      // for (let i = 0; i < fileList.length; i++) {
+      //   const file = fileList.item(i);
+      //   formData.append("backgroundImages", file);
+      // }
     }
 
     postBackgroundImage(formData, {
