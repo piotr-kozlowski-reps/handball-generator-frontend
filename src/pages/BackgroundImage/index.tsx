@@ -128,10 +128,6 @@ const BackgroundImage = () => {
     const fileList = values.backgroundImages;
     if (fileList) {
       fileList.forEach((file) => formData.append("backgroundImages", file));
-      // for (let i = 0; i < fileList.length; i++) {
-      //   const file = fileList.item(i);
-      //   formData.append("backgroundImages", file);
-      // }
     }
 
     postBackgroundImage(formData, {
@@ -142,6 +138,7 @@ const BackgroundImage = () => {
           title: "Dodano obrazek/obrazki tła.",
           message: `Dodany obrazek/obrazki tła.`,
         });
+        setBackgroundImages([]);
         formikHelpers.setSubmitting(false);
         formikHelpers.resetForm();
       },
