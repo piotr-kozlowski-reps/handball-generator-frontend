@@ -74,14 +74,13 @@ const ImageUploadFormik = (props: Props) => {
     []
   );
 
-  ////useDropZone - start
+  ////useDropZone
   const { getRootProps, getInputProps, isDragActive, isFileDialogActive } =
     useDropzone({
       accept: accept,
       maxFiles: maxFiles || 1,
       onDrop,
     });
-  //useDropZone - end
 
   const clearErrorInFormik = useCallback(() => {
     formik.setFieldError(name, undefined);
@@ -94,6 +93,11 @@ const ImageUploadFormik = (props: Props) => {
   useEffect(() => {
     if (isDragActive || isFileDialogActive) formik.setFieldTouched(name);
   }, [isDragActive, isFileDialogActive]);
+
+  /** clears images when form reset */
+  // useEffect(() => {
+  //   setFiles(formik.values[name]);
+  // }, [formik.values[name]]);
 
   /** clears data uris to avoid memory leaks*/
   useEffect(() => {

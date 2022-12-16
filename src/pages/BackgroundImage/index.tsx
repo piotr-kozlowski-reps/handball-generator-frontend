@@ -113,7 +113,6 @@ const BackgroundImage = () => {
     console.log({ values });
 
     const formData: any = new FormData();
-    // formData.append("backgroundImageName", values.backgroundImageName);
 
     //files
     const fileList = values.backgroundImages;
@@ -139,6 +138,7 @@ const BackgroundImage = () => {
             (image: any) => `\n${image.fileName} bo: ${image.error}`
           )}`,
         });
+        setBackgroundImages([]);
         formikHelpers.setSubmitting(false);
         formikHelpers.resetForm();
       },
