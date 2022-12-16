@@ -21,6 +21,7 @@ import {
   SendImagesStrategy,
   SendOnlyImage,
 } from "../../utils/sendImagesStrategy";
+import deleteDistHelper from "../../utils/deleteDistHelper";
 const QUERY_KEY = QUERIES_DATA.TEAMS.queryKey;
 const ADDRESS = QUERIES_DATA.TEAMS.address;
 
@@ -158,7 +159,9 @@ const Team = () => {
                   miejsce: <span className="font-bold">{team.place}</span>
                 </p>
                 <img
-                  src={`${process.env.REACT_APP_BACKEND_URL}/${team.teamCrestImage}`}
+                  src={`${process.env.REACT_APP_BACKEND_URL}/${deleteDistHelper(
+                    team.teamCrestImage
+                  )}`}
                   alt={team.teamName}
                   width="50"
                   height="50"

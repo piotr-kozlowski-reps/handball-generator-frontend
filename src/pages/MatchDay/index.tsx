@@ -1,15 +1,15 @@
 import React, { Fragment, useEffect, useState } from "react";
 import * as Yup from "yup";
 import { Form, Formik, FormikHelpers, FormikProps } from "formik";
-import { useGetData } from "../hooks/useCRUDHelperWithCredentials";
-import Loading from "./ui/Loading";
-import { IMatchDayFormValues, IMatchDay } from "../utils/types/app.types";
+import { useGetData } from "../../hooks/useCRUDHelperWithCredentials";
+import Loading from "../../components/ui/Loading";
+import { IMatchDayFormValues, IMatchDay } from "../../utils/types/app.types";
 import { useLocation } from "react-router-dom";
+import axios from "axios";
 import useImage from "use-image";
 
-import { QUERIES_DATA } from "../utils/queriesData/predefinedQueriesData";
-import KonvaImage from "./konva/KonvaImage";
-import StageMatchDay from "./konva/StageMatchDay";
+import { QUERIES_DATA } from "../../utils/queriesData/predefinedQueriesData";
+import StageMatchDay from "../../components/konva/StageMatchDay";
 const QUERY_KEY = QUERIES_DATA.BACKGROUND_IMAGES.queryKey;
 const ADDRESS = QUERIES_DATA.BACKGROUND_IMAGES.address;
 
@@ -17,10 +17,48 @@ const MatchDay = () => {
   ////vars
   const [backgrounds, setBackgrounds] = useState<IMatchDay[]>([]);
   const location = useLocation();
+  const [testImage, setTestImage] = useState<any>();
 
   const [imageBackground] = useImage(
-    `${process.env.REACT_APP_BACKEND_URL}/images/background-images/janza_2___20221109-163118.jpg`
+    `${process.env.REACT_APP_BACKEND_URL}/images/background-images/sklad_uklad_lista_wyjazd___20221211-215310.jpg`
   );
+
+  // useEffect(() => {
+  //   const fetchImage = async () => {
+  //     const image = await axios.get(
+  //       `${process.env.REACT_APP_BACKEND_URL}/images/background-images/sklad_uklad_lista_wyjazd___20221211-215310.jpg`,
+  //       { withCredentials: true }
+  //     );
+
+  //     setTestImage(image);
+  //   };
+
+  //   fetchImage();
+
+  //   // fetch(
+  //   //   `${process.env.REACT_APP_BACKEND_URL}/images/background-images/sklad_uklad_lista_wyjazd___20221211-215310.jpg`,
+  //   //   {
+  //   //     headers: {
+  //   //       "Access-Control-Allow-Origin": "http://127.0.0.1:5000",
+  //   //     },
+  //   //   }
+  //   // )
+  //   //   .then((res) => res.blob())
+  //   //   .then((blob) => {
+  //   //     console.log({ blob });
+  //   //     const file = new File([blob], "image", { type: blob.type });
+  //   //     console.log({ file });
+  //   //   });
+  // }, []);
+
+  // console.log(imageBackground);
+
+  // await convertImageIntoBase64(image_podklad, (base64String) => {
+  //   console.log();
+
+  // })
+
+  console.log({ testImage });
 
   ////CRUD
   const { data, isLoading: isLoadingGet } = useGetData(
@@ -62,6 +100,7 @@ const MatchDay = () => {
     <Fragment>
       <div className="">
         <StageMatchDay
+          // imageBackground={imageBackground}
           imageBackground={imageBackground}
           mainText={`DZIEŃ MECZOWY !`}
           date="08.11.2022"

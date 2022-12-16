@@ -1,25 +1,26 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { Form, Formik, FormikHelpers, FormikProps } from "formik";
-import useNotification from "../hooks/useNotification";
+import useNotification from "../../hooks/useNotification";
 import {
   ISponsorBarFormValues,
   SponsorBarInterface,
-} from "../utils/types/app.types";
+} from "../../utils/types/app.types";
 import {
   usePostData,
   useGetData,
   useDeleteData,
-} from "../hooks/useCRUDHelperWithCredentials";
+} from "../../hooks/useCRUDHelperWithCredentials";
 import * as Yup from "yup";
-import Notification from "./ui/Notification";
-import FormikControl from "./formik-components/FormikControl";
-import Button from "./ui/Button";
-import Loading from "./ui/Loading";
+import Notification from "../../components/ui/Notification";
+import FormikControl from "../../components/formik-components/FormikControl";
+import Button from "../../components/ui/Button";
+import Loading from "../../components/ui/Loading";
 import { AxiosError } from "axios";
-import { NOTIFICATIONS } from "../utils/notifications/predefinedNotifications";
+import { NOTIFICATIONS } from "../../utils/notifications/predefinedNotifications";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { QUERIES_DATA } from "../utils/queriesData/predefinedQueriesData";
+import { QUERIES_DATA } from "../../utils/queriesData/predefinedQueriesData";
+import deleteDistHelper from "../../utils/deleteDistHelper";
 const QUERY_KEY = QUERIES_DATA.SPONSORS_BARS.queryKey;
 const ADDRESS = QUERIES_DATA.SPONSORS_BARS.address;
 
@@ -148,7 +149,9 @@ const Sponsors = () => {
                   <span className="font-bold">{sponsorBar.barName}</span>
                 </p>
                 <img
-                  src={`${process.env.REACT_APP_BACKEND_URL}/${sponsorBar.sponsorsBarImage}`}
+                  src={`${process.env.REACT_APP_BACKEND_URL}/${deleteDistHelper(
+                    sponsorBar.sponsorsBarImage
+                  )}`}
                   alt={sponsorBar.barName}
                   width="250"
                   height="80"

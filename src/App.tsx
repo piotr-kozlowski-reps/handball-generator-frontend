@@ -10,9 +10,9 @@ import RequireAuth from "./components/RequireAuth";
 import Home from "./components/Home";
 import Teams from "./pages/Teams/index";
 import BackgroundImage from "./pages/BackgroundImage";
-import Sponsors from "./components/Sponsors";
-import GameName from "./components/GameName";
-import MatchDay from "./components/MatchDay";
+import Sponsors from "./pages/SponsorsBar";
+import GameName from "./pages/GameName";
+import MatchDay from "./pages/MatchDay";
 import MatchConfig from "./components/MatchConfig";
 
 const ROLES = {

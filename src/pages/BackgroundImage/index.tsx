@@ -20,6 +20,7 @@ import {
 import useRefreshToken from "../../hooks/useRefreshToken";
 import { useLocation, useNavigate } from "react-router-dom";
 import { QUERIES_DATA } from "../../utils/queriesData/predefinedQueriesData";
+import deleteDistHelper from "../../utils/deleteDistHelper";
 
 const QUERY_KEY = QUERIES_DATA.BACKGROUND_IMAGES.queryKey;
 const ADDRESS = QUERIES_DATA.BACKGROUND_IMAGES.address;
@@ -73,17 +74,19 @@ const BackgroundImage = () => {
   const validationSchema = Yup.object({
     // backgroundImageName: Yup.string().required("Nazwa tła jest wymagana."),
     backgroundImages: Yup.mixed()
-      .test({
-        name: "required",
-        message: "Obrazek/obrazki tła są wymagane.",
-        test: (value) => value !== null,
+      .test("required", "Obrazek/obrazki tła są wymagane.", (value) => {
+        console.log("required test: ", { value });
+        return value !== null;
       })
-      .test({
-        name: "type",
-        message: "Obrazki tła muszą być plikami PNG/JPG/JPEG.",
-        test: (value) => {
-          let areImagesCorrect = true;
-          const files = value as File[];
+      .test("type", "Obrazki tła muszą być plikami PNG/JPG/JPEG.", (value) => {
+        console.log("type test: ", { value });
+
+        let areImagesCorrect = true;
+        const files = value as File[] | null;
+        console.log({ files });
+
+        if (!files) areImagesCorrect = false;
+        if (files) {
           files.forEach((file) => {
             areImagesCorrect =
               areImagesCorrect &&
@@ -91,35 +94,22 @@ const BackgroundImage = () => {
                 file?.type === "image/jpg" ||
                 file?.type === "image/jpeg");
           });
-          return areImagesCorrect;
-        },
+        }
+
+        console.log(areImagesCorrect);
+
+        console.log({ files });
+        console.log({ areImagesCorrect });
+
+        return areImagesCorrect;
       }),
-    // .test({
-    //   name: "type",
-    //   message: "Obrazki tła muszą być plikami PNG/JPG/JPEG.",
-    //   test: (value) => {
-    //     let isImageCorrect = true;
-    //     const filesContainer = value as FileList;
-    //     if (!filesContainer) return false;
-
-    //     for (let i = 0; i < filesContainer.length; i++) {
-    //       const file = filesContainer.item(i);
-    //       isImageCorrect =
-    //         isImageCorrect &&
-    //         (file?.type === "image/png" ||
-    //           file?.type === "image/jpg" ||
-    //           file?.type === "image/jpeg");
-    //     }
-
-    //     return isImageCorrect;
-    //   },
-    // }),
   });
 
   const onSubmitHandler = async (
     values: IBackgroundImageFormValues,
     formikHelpers: FormikHelpers<IBackgroundImageFormValues>
   ) => {
+    console.log("onSubmitHandler");
     console.log({ values });
 
     const formData: any = new FormData();
@@ -129,10 +119,13 @@ const BackgroundImage = () => {
     const fileList = values.backgroundImages;
     if (fileList) {
       for (let i = 0; i < fileList.length; i++) {
-        const file = fileList.item(i);
+        // const file = fileList.item(i);
+        const file = fileList[i];
         formData.append("backgroundImages", file);
       }
     }
+
+    console.log({ fileList });
 
     postBackgroundImage(formData, {
       onSuccess: (data) => {
@@ -140,7 +133,11 @@ const BackgroundImage = () => {
         showNotification({
           status: "success",
           title: "Dodano obrazek/obrazki tła.",
-          message: `Dodany obrazek/obrazki tła.`,
+          message: `Dodany obrazek/obrazki: ${data.data.processedImages.map(
+            (image: any) => `\n${image.backgroundImageName}`
+          )}\\nNie dodany obrazek/obrazki: ${data.data.unprocessedImages.map(
+            (image: any) => `\n${image.fileName} bo: ${image.error}`
+          )}`,
         });
         formikHelpers.setSubmitting(false);
         formikHelpers.resetForm();
@@ -187,7 +184,9 @@ const BackgroundImage = () => {
                   </span>
                 </p>
                 <img
-                  src={`${process.env.REACT_APP_BACKEND_URL}/${background.backgroundImageThumbnail}`}
+                  src={`${process.env.REACT_APP_BACKEND_URL}/${deleteDistHelper(
+                    background.backgroundImageThumbnail
+                  )}`}
                   alt={background.backgroundImageName}
                   width="200"
                   height="200"

@@ -1,6 +1,9 @@
+import Konva from "konva";
+import { add } from "lodash";
 import { Fragment, useRef } from "react";
 import { Stage, Layer, Image, Text } from "react-konva";
 import useImage from "use-image";
+import convertImageIntoBase64 from "../../utils/convertImageIntoBase64";
 
 interface StageMatchDayProps {
   imageBackground: HTMLImageElement | undefined;
@@ -27,7 +30,13 @@ StageMatchDayProps) => {
     `${process.env.REACT_APP_BACKEND_URL}/images/background-images/canvas___20221109-162530.png`,
     "anonymous"
   );
+
   //TODO: do wywalenia - end
+  // const image_podklad = Konva.Image.fromURL(
+  //   `${process.env.REACT_APP_BACKEND_URL}/images/background-images/canvas___20221109-162530.png`,
+  //   () => {}
+  // );
+  console.log(image_podklad);
 
   ////logic
   const handleSaveInner = () => {
@@ -52,7 +61,7 @@ StageMatchDayProps) => {
         scaleY={0.4}
         ref={stageRef}
       >
-        <Layer>
+        {/* <Layer>
           <Image
             image={image_podklad}
             width={1024}
@@ -61,7 +70,8 @@ StageMatchDayProps) => {
             y={0}
             cross
           />
-        </Layer>
+        </Layer> */}
+
         <Layer>
           <Image
             image={imageBackground}

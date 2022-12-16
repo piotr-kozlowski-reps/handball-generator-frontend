@@ -1,22 +1,27 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { Form, Formik, FormikHelpers, FormikProps } from "formik";
-import useNotification from "../hooks/useNotification";
+import useNotification from "../../hooks/useNotification";
 import {
   usePostData,
   useGetData,
   useDeleteData,
-} from "../hooks/useCRUDHelperWithCredentials";
+} from "../../hooks/useCRUDHelperWithCredentials";
 import * as Yup from "yup";
-import Notification from "./ui/Notification";
-import FormikControl from "./formik-components/FormikControl";
-import Button from "./ui/Button";
-import Loading from "./ui/Loading";
+import Notification from "../../components/ui/Notification";
+import FormikControl from "../../components/formik-components/FormikControl";
+import Button from "../../components/ui/Button";
+import Loading from "../../components/ui/Loading";
 import { AxiosError } from "axios";
-import { NOTIFICATIONS } from "../utils/notifications/predefinedNotifications";
+import { NOTIFICATIONS } from "../../utils/notifications/predefinedNotifications";
 import { useLocation, useNavigate } from "react-router-dom";
-import { IGameNameFormValues, IGameName } from "../utils/types/app.types";
+import { IGameNameFormValues, IGameName } from "../../utils/types/app.types";
 
-import { QUERIES_DATA } from "../utils/queriesData/predefinedQueriesData";
+import { QUERIES_DATA } from "../../utils/queriesData/predefinedQueriesData";
+import deleteDistHelper from "../../utils/deleteDistHelper";
+import {
+  SendImagesStrategy,
+  SendOnlyImage,
+} from "../../utils/sendImagesStrategy";
 const QUERY_KEY = QUERIES_DATA.GAME_NAMES.queryKey;
 const ADDRESS = QUERIES_DATA.GAME_NAMES.address;
 
@@ -74,13 +79,21 @@ const GameName = () => {
       .test({
         name: "type",
         message: "Grafika rozgrywek musi być plikiem PNG/JPG/JPEG.",
-        test: (value) =>
-          value &&
-          (value.type === "image/png" ||
-            value.type === "image/jpg" ||
-            value.type === "image/jpeg"),
+        test: (value) => {
+          let areImagesCorrect = true;
+          const files = value as File[];
+          files.forEach((file) => {
+            areImagesCorrect =
+              areImagesCorrect &&
+              (file?.type === "image/png" ||
+                file?.type === "image/jpg" ||
+                file?.type === "image/jpeg");
+          });
+          return areImagesCorrect;
+        },
       }),
   });
+
   const onSubmitHandler = async (
     values: IGameNameFormValues,
     formikHelpers: FormikHelpers<IGameNameFormValues>
@@ -89,7 +102,12 @@ const GameName = () => {
 
     const formData: any = new FormData();
     formData.append("gameName", values.gameName);
-    formData.append("gameImage", values.gameImage);
+    formData.append(
+      "gameImage",
+      SendImagesStrategy.prepareImageOrArrayOfImages(SendOnlyImage).sendImage(
+        values.gameImage
+      )
+    );
     postGameName(formData, {
       onSuccess: (data) => {
         console.log(data.data);
@@ -141,7 +159,9 @@ const GameName = () => {
                   <span className="font-bold">{gameName.gameName}</span>
                 </p>
                 <img
-                  src={`${process.env.REACT_APP_BACKEND_URL}/${gameName.gameImage}`} //TODO: finalnie .backgroundImageThumbnail
+                  src={`${process.env.REACT_APP_BACKEND_URL}/${deleteDistHelper(
+                    gameName.gameImage
+                  )}`}
                   alt={gameName.gameName}
                   width="200"
                   height="200"
@@ -191,8 +211,8 @@ const GameName = () => {
                   />
                 </div>
 
-                <div className="w-full p-2">
-                  <input
+                {/* <div className="w-full p-2"> */}
+                {/* <input
                     id="gameImage"
                     name="gameImage"
                     type="file"
@@ -202,6 +222,21 @@ const GameName = () => {
                         event?.currentTarget?.files?.[0]
                       );
                     }}
+                  />
+                </div> */}
+
+                <div className="w-full p-2">
+                  <FormikControl
+                    control="image"
+                    label="Pliki rodzaju rozgrywek"
+                    name="gameImage"
+                    // additionalText="(Provide only one file. Formats supported: .jpg .jpeg .png
+                    //   .gif. Remember -> Here PhoneImage with 345x701px resolution.)"
+                    placeholder=""
+                    additionalClass=""
+                    maxFiles={100}
+                    accept={{ "image/*": [".png", ".jpg", ".jpeg", ".gif"] }}
+                    formik={formik}
                   />
                 </div>
 

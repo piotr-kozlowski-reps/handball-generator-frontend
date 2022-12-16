@@ -50,7 +50,7 @@ export interface IGameName {
 }
 export interface IGameNameFormValues {
   gameName: string;
-  gameImage: File | null;
+  gameImage: File[] | null;
 }
 
 //match-config
